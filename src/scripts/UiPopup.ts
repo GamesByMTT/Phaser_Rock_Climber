@@ -370,11 +370,11 @@ export class UiPopups extends Phaser.GameObjects.Container {
         // Popup background image
         const popupBg = this.scene.add.image(0, 0, 'messagePopup').setDepth(10);
         popupBg.setOrigin(0.5);
-        popupBg.setDisplaySize(900, 559); // Set the size for your popup background
+        popupBg.setDisplaySize(900, 671); // Set the size for your popup background
         popupBg.setAlpha(1); // Set background transparency
         this.exitBtn.disableInteractive();
 
-        const quitHeading = this.scene.add.text(0, 0, "QUIT GAME", {color:"#000000", fontSize: "50px", fontFamily: 'crashLandingItalic', })
+        const quitHeading = this.scene.add.text(-150, -250, "QUIT GAME", {color:"#000000", fontSize: "100px", fontFamily: 'crashLandingItalic', })
         // Add text to the popup
         const popupText = new TextLabel(this.scene, 0, -45, "Do you really want \n to exit?", 50, "#000000");
         

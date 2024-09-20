@@ -7,6 +7,7 @@ import { Globals } from "../scripts/Globals";
 import SoundManager from "../scripts/SoundManager";
 import { Howl } from "howler";
 import GambleScene from "./GambleScene";
+import WebFont from "webfontloader";
 
 export default class MainLoader extends Scene {
     resources: any;
@@ -48,6 +49,16 @@ export default class MainLoader extends Scene {
             this.addBackgroundImage();
             this.startLoadingAssets();
         });
+
+        WebFont.load({
+            custom: {
+              families: ['CrashLandingItalic'],
+              urls: ['src/fonts/CrashLandingBB.ttf']
+            },
+            active: function() {
+              // Fonts have loaded
+            }
+          });
     }
     private addBackgroundImage() {
         const { width, height } = this.scale;
@@ -170,19 +181,12 @@ export default class MainLoader extends Scene {
             if (typeof value === "string") {
                 this.load.audio(key, [value]); // Cast value to string
             }
-        });
-
-        Object.entries(fontData).forEach(([key, value]) => {
-            if (typeof value === 'string') {
-                // this.load.addFile();
-            }
-        });
+        });      
 
         this.load.start();
 
         this.load.on('progress', (value: number) => {
             const adjustedValue = Math.min(value * this.maxProgress, this.maxProgress);
-            // this.updateProgressBar(adjustedValue);
         });
         this.load.on('complete', () => {
             if (Globals.Socket?.socketLoaded) {
