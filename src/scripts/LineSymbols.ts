@@ -31,12 +31,12 @@ export default class LineSymbols extends Phaser.GameObjects.Container{
         let yPosition = (index / 2) * 140 - 520; // Adjusted Y position for both sides
 
         // For left side sprites
-        leftSprite = scene.add.sprite(-gameConfig.scale.width / 3.65, yPosition + 380, `left${index}`);
+        leftSprite = scene.add.sprite(-gameConfig.scale.width / 3.20, yPosition + 380, `left${index}`);
         leftSprite.setInteractive({ useHandCursor: true }).setDepth(5);
         numberContainer.add(leftSprite);
 
         // For right side sprites
-        rightSprite = scene.add.sprite(gameConfig.scale.width / 3.65, yPosition + 380, `right${index}`);
+        rightSprite = scene.add.sprite(gameConfig.scale.width / 3.2, yPosition + 380, `right${index}`);
         rightSprite.setInteractive({ useHandCursor: true }).setDepth(5);
         numberContainer.add(rightSprite);
 

@@ -17,9 +17,11 @@ export const LoaderConfig = {
     pBtnH  :  "/src/sprites/ButtonPlusHover.png",
     mBtnH  :  "/src/sprites/ButtonMinusHover.png",
     lines :  "/src/sprites/PanelLines.png",
-    winPanel :  "/src/sprites/PanelWin.png",    
+    winPanel :  "/src/sprites/PanelWin.png",
+    winPanel1:  "/src/sprites/PanelWin1.png",        
     balancePanel :  "/src/sprites/PanelBalance.png",
     doubleButton: "src/sprites/doubleButton.png",
+    doubleButtonPressed : "src/sprites/doubleButtonPressed.png",
     winBg: "src/sprites/winBg.png",
     MenuBtn :  "/src/sprites/ButtonMenu.png",
     MenuBtnH :  "/src/sprites/ButtonMenuHover.png",
@@ -27,6 +29,7 @@ export const LoaderConfig = {
     settingBtnH :  "/src/sprites/ButtonSettingsHover.png",
     infoBtn :  "/src/sprites/ButtonInfo.png",
     infoBtnH :  "/src/sprites/ButtonInfoHover.png",
+    linesNumber: "src/sprites/LinesNumber.png",
 
     inofIcon1: "src/sprites/info1.png",
     inofIcon2: "src/sprites/info2.png",
@@ -38,7 +41,7 @@ export const LoaderConfig = {
     inofIcon8: "src/sprites/info8.png",
 
     exitButton: "src/sprites/ExitButton.png",
-    exitButtonPressed: "src/sprites/ExitButtonHover.png",
+    exitButtonPressed: "src/sprites/ExitButton.png",
     PopupBackground: "src/sprites/popupBackground.png",
     messagePopup: "src/sprites/messagePopup.png",
     normalButton: "src/sprites/NormalButton.png",
@@ -570,12 +573,12 @@ export const LoaderConfig = {
 
 
 export const staticData = {
-    // logoURL: "https://cccdn.b-cdn.net/1584464368856.png",
-    // logoURL:  "/static/logo.png").default,
     Background:  "src/sprites/Background.jpg",
 };
 
-export const fontData = ["Montserrat"];
+export const fontData = {
+    crashLandingItalic : "src/fonts/CrashLandingBB.ttf"
+}
 
 
 

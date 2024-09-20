@@ -17,11 +17,14 @@ export class UiContainer extends Phaser.GameObjects.Container {
     fireAnimation: Phaser.GameObjects.Sprite[] = [];
     CurrentBetText!: TextLabel;
     currentWiningText!: TextLabel;
+    WiningText!: Phaser.GameObjects.Text;
     currentBalanceText!: TextLabel;
     CurrentLineText!: TextLabel;
     freeSpinText!: TextLabel;
     pBtn!: Phaser.GameObjects.Sprite;
-    mBtn!: Phaser.GameObjects.Sprite
+    mBtn!: Phaser.GameObjects.Sprite;
+    linesNumber!: Phaser.GameObjects.Sprite;
+    fadeDoubbleButton!: Phaser.GameObjects.Sprite;
     public isAutoSpinning: boolean = false; // Flag to track if auto-spin is active
     mainScene!: Phaser.Scene
     fireSprite1!: Phaser.GameObjects.Sprite
@@ -42,6 +45,8 @@ export class UiContainer extends Phaser.GameObjects.Container {
         this.winBtnInit();
         this.balanceBtnInit();
         this.BetBtnInit();
+        this.fadeDoubbleBtn()
+        this.linesNumberInit();
         this.SoundManager = soundManager;
     }
 
@@ -50,12 +55,11 @@ export class UiContainer extends Phaser.GameObjects.Container {
      */
     lineBtnInit() { 
         const container = this.scene.add.container(0, 0);
-        // const lineText = new TextLabel(this.scene, -20, -70, "LINES", 30, "#3C2625");
         const linePanel = this.scene.add.sprite(0, 0, "lines").setDepth(0);
         linePanel.setOrigin(0.5);
         linePanel.setPosition(linePanel.width * 1.2, gameConfig.scale.height/2 - 100);
         // container.add(lineText);
-        this.pBtn = this.createButton('pBtn', gameConfig.scale.width / 2 - this.maxbetBtn.width / 1.3, gameConfig.scale.height - this.maxbetBtn.height * 0.7, () => {
+        this.pBtn = this.createButton('pBtn', gameConfig.scale.width / 2 - this.maxbetBtn.width / 2.15, gameConfig.scale.height - this.maxbetBtn.height * 0.7, () => {
             this.bnuttonMusic("buttonpressed");
             this.pBtn.setTexture('pBtnH');
             this.pBtn.disableInteractive();
@@ -73,7 +77,7 @@ export class UiContainer extends Phaser.GameObjects.Container {
                 this.pBtn.setTexture('pBtn');
                 this.pBtn.setInteractive({ useHandCursor: true, pixelPerfect: true });
             });
-        }).setDepth(0);
+        }).setDepth(0).setScale(0.8);
         container.add(this.pBtn);
         this.CurrentLineText = new TextLabel(this.scene, linePanel.x, linePanel.y + 55, initData.gameData.Bets[currentGameData.currentBetIndex], 27, "#ffffff");
         //Line Count
@@ -88,11 +92,13 @@ export class UiContainer extends Phaser.GameObjects.Container {
         const winPanel = this.scene.add.sprite(0, 0, 'winPanel');
         winPanel.setOrigin(0.5);
         // winPanel.setScale(0.8, 0.8)
-        winPanel.setPosition(gameConfig.scale.width/2, gameConfig.scale.height/2 + (winPanel.width *0.9));
+        winPanel.setPosition(gameConfig.scale.width/2, gameConfig.scale.height/2 + (winPanel.width * 0.8));
+        winPanel.setDisplaySize(384,190)
         const currentWining: any = ResultData.playerData.currentWining;
-        this.currentWiningText = new TextLabel(this.scene, 0, 7, currentWining, 40, "#FFFFFF");
+        this.currentWiningText = new TextLabel(this.scene, 0, -15, currentWining, 40, "#0ac9ff");
+        this.WiningText = this.scene.add.text(-70, 15, "Winnings", {color:"#0ac9ff", fontSize: "30px", align:"center"})
         const winPanelChild = this.scene.add.container(winPanel.x, winPanel.y)
-        winPanelChild.add(this.currentWiningText);
+        winPanelChild.add([this.currentWiningText, this.WiningText]);
         if(currentWining > 0){
             // console.log(currentWining, "currentWining");
             this.scene.tweens.add({
@@ -111,24 +117,23 @@ export class UiContainer extends Phaser.GameObjects.Container {
      * @description added the sprite/placeholder and Text for Total Balance 
      */
     balanceBtnInit() {
-        const balancePanel = this.scene.add.sprite(0, 0, 'balancePanel');
+        const balancePanel = this.scene.add.sprite(0, 0, 'balancePanel').setScale(0.8);
         balancePanel.setOrigin(0.5);
-        balancePanel.setPosition(gameConfig.scale.width / 3.25, gameConfig.scale.height/8);
+        balancePanel.setPosition(gameConfig.scale.width / 3, gameConfig.scale.height/8);
         const container = this.scene.add.container(balancePanel.x, balancePanel.y);
         // container.add(balancePanel);
         currentGameData.currentBalance = initData.playerData.Balance;
-        this.currentBalanceText = new TextLabel(this.scene, 0, 15, currentGameData.currentBalance.toFixed(2), 27, "#ffffff");
-        container.add(this.currentBalanceText);
+        const creditHeading = this.scene.add.text(-65, -60, "Credit", {color: "#ffffff", align: "center", fontSize: "35px"})
+        this.currentBalanceText = new TextLabel(this.scene, 0, 0, currentGameData.currentBalance.toFixed(2), 27, "#ffffff");
+        container.add([creditHeading, this.currentBalanceText]);
     }
-/**
+    /**
      * @method spinBtnInit Spin the reel
      * @description this method is used for creating and spin button and on button click the a SPIn emit will be triggered to socket and will deduct the amout according to the bet
      */
     spinBtnInit(spinCallBack: () => void) {
-        
         this.spinBtn = new Phaser.GameObjects.Sprite(this.scene, 0, 0, "spinBtn");
-       
-        this.spinBtn = this.createButton('spinBtn', gameConfig.scale.width / 1.15, gameConfig.scale.height/1.1, () => {
+        this.spinBtn = this.createButton('spinBtn', gameConfig.scale.width / 1.2, gameConfig.scale.height/1.1, () => {
             // this.spinButtonSound = this.scene.sound.add("spinButton", {loop: false, volume: 0.8})
             // this.spinButtonSound.play();
                 this.bnuttonMusic("spinButton");
@@ -164,15 +169,15 @@ export class UiContainer extends Phaser.GameObjects.Container {
      * @description this method is used to add a spirte button and the button will be used to increase the betamount to maximun example on this we have twenty lines and max bet is 1 so the max bet value will be 1X20 = 20
      */
     maxBetInit() {
-        this.maxbetBtn =  new Phaser.GameObjects.Sprite(this.scene, 0, 0, 'maxBetBtn');
-        this.maxbetBtn = this.createButton('maxBetBtn', gameConfig.scale.width / 2 + this.maxbetBtn.width * 0.25, gameConfig.scale.height - this.maxbetBtn.height * 0.7 , () => {
+        this.maxbetBtn =  new Phaser.GameObjects.Sprite(this.scene, 0, 0, 'maxBetBtn')
+        this.maxbetBtn = this.createButton('maxBetBtn', gameConfig.scale.width / 2 + this.maxbetBtn.width * 0.40, gameConfig.scale.height - this.maxbetBtn.height * 0.7 , () => {
             if (this.SoundManager) {
                 this.bnuttonMusic("buttonpressed");
             }
             this.scene.tweens.add({
                 targets: this.maxbetBtn,
-                scaleX: 1.1,
-                scaleY: 1.1,
+                scaleX: 0.9,
+                scaleY: 0.9,
                 duration: 100,
                 onComplete: ()=>{
                     this.maxbetBtn.setTexture("maxBetBtOnPressed")
@@ -182,8 +187,8 @@ export class UiContainer extends Phaser.GameObjects.Container {
                     this.CurrentLineText.updateLabelText(initData.gameData.Bets[initData.gameData.Bets.length - 1]);
                     this.scene.tweens.add({
                         targets: this.maxbetBtn,
-                        scaleX: 1,
-                        scaleY: 1,
+                        scaleX: 0.8,
+                        scaleY: 0.8,
                         duration: 100,
                         onComplete: ()=>{
                             this.maxbetBtn.setTexture("maxBetBtn");
@@ -193,8 +198,7 @@ export class UiContainer extends Phaser.GameObjects.Container {
                     
                 }
             })
-        
-        }).setDepth(0);      
+        }).setDepth(0).setScale(0.8);      
     }
     /**
      * @method autoSpinBtnInit 
@@ -205,8 +209,8 @@ export class UiContainer extends Phaser.GameObjects.Container {
         this.autoBetBtn = new Phaser.GameObjects.Sprite(this.scene, 0, 0, "autoSpin");
         this.autoBetBtn = this.createButton(
             'autoSpin',
-            this.autoBetBtn.width - this.autoBetBtn.width/4,
-            gameConfig.scale.height - this.spinBtn.height/1.1,
+            this.autoBetBtn.width * 1.1,
+            gameConfig.scale.height/1.1,
             () => {
                 // this.normalButtonSound.play()
                 this.scene.tweens.add({
@@ -235,19 +239,35 @@ export class UiContainer extends Phaser.GameObjects.Container {
         ).setDepth(0);
         this.autoBetBtn.setScale(0.8)
     }
+
+    /**
+     * @method fadeDoubbleBtn
+     */
+    fadeDoubbleBtn(){
+        if(this.fadeDoubbleButton){
+            if(this.fadeDoubbleButton.scene == undefined){
+                this.fadeDoubbleButton = this.scene.add.sprite(gameConfig.scale.width / 2 + this.maxbetBtn.height * 3.45, gameConfig.scale.height - this.maxbetBtn.height, "doubleButton").setScale(0.8)
+            }
+        }else{
+            this.fadeDoubbleButton = this.scene.add.sprite(gameConfig.scale.width / 2 + this.maxbetBtn.height * 3.45, gameConfig.scale.height - this.maxbetBtn.height, "doubleButton").setScale(0.8)
+        }
+    }
     /**
      * @method BetBtnInit 
      * @description this method is used to create the bet Button which will show the totla bet which is placed and also the plus and minus button to increase and decrese the bet value
      */
     BetBtnInit() {
-        const container = this.scene.add.container(gameConfig.scale.width / 1.45, gameConfig.scale.height/8);
-        this.betButtonDisable = container    
-        const betPanel = this.scene.add.sprite(0, 0, 'BetPanel').setOrigin(0.5).setDepth(4);
+        const container = this.scene.add.container(gameConfig.scale.width / 1.5, gameConfig.scale.height/8);
+        this.betButtonDisable = container;
+        const betPanelHeading = this.scene.add.text(-90, -60, "Total Bet", {color: "#ffffff", align: "center", fontSize: "35px"})
+        const betPanel = this.scene.add.sprite(0, 0, 'balancePanel').setOrigin(0.5).setDepth(4).setScale(0.8);
         container.add(betPanel);
-        this.CurrentBetText = new TextLabel(this.scene, 0, 15, ((initData.gameData.Bets[currentGameData.currentBetIndex]) * 20).toString(), 27, "#FFFFFF").setDepth(6);
-        container.add(this.CurrentBetText);
+        this.CurrentBetText = new TextLabel(this.scene, 0, 0, ((initData.gameData.Bets[currentGameData.currentBetIndex]) * 20).toString(), 27, "#FFFFFF").setDepth(6);
+        container.add([betPanelHeading, this.CurrentBetText]);
     }
-
+    linesNumberInit(){
+        this.linesNumber = this.scene.add.sprite(gameConfig.scale.width / 3.35, gameConfig.scale.height - this.maxbetBtn.height , "linesNumber").setScale(0.8)
+    }
     /**
      * @method freeSpininit 
      * @description this method is used for showing the number of freeSpin value at the top of reels
@@ -323,7 +343,9 @@ export class UiContainer extends Phaser.GameObjects.Container {
             // this.autoBetBtn.setTexture("autoSpinOnPressed");
             this.autoBetBtn.setTexture("autoSpin");
             this.maxbetBtn.disableInteractive();
+            this.maxbetBtn.setTexture("maxBetBtOnPressed");
             this.pBtn.disableInteractive();
+            this.pBtn.setTexture("pBtnH")
             // this.spinBtn.setAlpha(0.5)
             this.autoBetBtn.setAlpha(0.5)
         }else{
@@ -332,6 +354,8 @@ export class UiContainer extends Phaser.GameObjects.Container {
             this.maxbetBtn.setInteractive({ useHandCursor: true, pixelPerfect: true });
             this.pBtn.setInteractive({ useHandCursor: true, pixelPerfect: true });
             this.autoBetBtn.setAlpha(1)
+            this.pBtn.setTexture("pBtn")
+            this.maxbetBtn.setTexture("maxBetBtn");
            
         }        
     }
@@ -349,7 +373,9 @@ export class UiContainer extends Phaser.GameObjects.Container {
             // this.autoBetBtn.setTexture("autoSpinOnPressed")
             this.autoBetBtn.disableInteractive();
             this.maxbetBtn.disableInteractive();
+            this.maxbetBtn.setTexture("maxBetBtOnPressed");
             this.pBtn.disableInteractive();
+            this.pBtn.setTexture("pBtnH")
             this.spinBtn.setAlpha(0.5)
             this.autoBetBtn.setAlpha(0.5)
             
@@ -359,7 +385,9 @@ export class UiContainer extends Phaser.GameObjects.Container {
             this.autoBetBtn.setTexture("autoSpin");
             this.autoBetBtn.setInteractive({ useHandCursor: true, pixelPerfect: true });
             this.maxbetBtn.setInteractive({ useHandCursor: true, pixelPerfect: true });
+            this.maxbetBtn.setTexture("maxBetBtn");
             this.pBtn.setInteractive({ useHandCursor: true, pixelPerfect: true });
+            this.pBtn.setTexture("pBtn")
             this.spinBtn.setScale(0.8);
             this.autoBetBtn.setScale(0.8);
             this.spinBtn.setAlpha(1)
@@ -375,10 +403,13 @@ export class UiContainer extends Phaser.GameObjects.Container {
         if (parseFloat(this.currentWiningText.text) > 0) {
             // If doubleButton does not exist, create it
             if (!this.doubleButton || this.doubleButton.scene == undefined) {
-                this.doubleButton = this.createButton('doubleButton', gameConfig.scale.width / 2 + this.maxbetBtn.height * 2.9, gameConfig.scale.height - this.maxbetBtn.height * 0.9, () => {
+                if(this.fadeDoubbleButton){
+                    this.fadeDoubbleButton.destroy()
+                }
+                this.doubleButton = this.createButton('doubleButtonPressed', gameConfig.scale.width / 2 + this.maxbetBtn.height * 3.45, gameConfig.scale.height - this.maxbetBtn.height, () => {
                     Globals.Socket?.sendMessage("GambleInit", { id: "GambleInit", GAMBLETYPE: "HIGHCARD" });
                     Globals.SceneHandler?.addScene('GambleScene', GambleScene, true);
-                });
+                }).setScale(0.8);
     
                 // Start tween for scaling up and down continuously
                 this.scene.tweens.add({
@@ -402,12 +433,15 @@ export class UiContainer extends Phaser.GameObjects.Container {
                 });
             }
         } else {
-            // If currentWiningText.text is 0 and doubleButton exists, destroy it
+            if(!this.fadeDoubbleButton || this.fadeDoubbleButton.scene == undefined){
+                this.fadeDoubbleBtn()
+            }
             if (this.doubleButton) {
                 // Stop all tweens associated with doubleButton
                 this.scene.tweens.killTweensOf(this.doubleButton);
-                this.doubleButton.destroy();               
+                this.doubleButton.destroy(); 
             }
+           
         }
     }
     

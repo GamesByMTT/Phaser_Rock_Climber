@@ -2,7 +2,7 @@
 
 import { Scene, GameObjects } from "phaser";
 import MainScene from "./MainScene";
-import { LoaderConfig, LoaderSoundConfig } from "../scripts/LoaderConfig";
+import { LoaderConfig, LoaderSoundConfig, fontData } from "../scripts/LoaderConfig";
 import { Globals } from "../scripts/Globals";
 import SoundManager from "../scripts/SoundManager";
 import { Howl } from "howler";
@@ -169,6 +169,12 @@ export default class MainLoader extends Scene {
         Object.entries(LoaderSoundConfig).forEach(([key, value]) => {
             if (typeof value === "string") {
                 this.load.audio(key, [value]); // Cast value to string
+            }
+        });
+
+        Object.entries(fontData).forEach(([key, value]) => {
+            if (typeof value === 'string') {
+                // this.load.addFile();
             }
         });
 

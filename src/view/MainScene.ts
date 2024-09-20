@@ -47,12 +47,12 @@ export default class MainScene extends Scene {
         this.uiContainer = new UiContainer(this, () => this.onSpinCallBack(), this.soundManager);
         this.mainContainer.add(this.uiContainer);
         // // Initialize Slots
-            // this.slot = new Slots(this, this.uiContainer,() => this.onResultCallBack(), this.soundManager);
-            // this.mainContainer.add(this.slot);
+        this.slot = new Slots(this, this.uiContainer,() => this.onResultCallBack(), this.soundManager);
+        this.mainContainer.add(this.slot);
 
-            // // Initialize payLines
-            // this.lineGenerator = new LineGenerator(this, this.slot.slotSymbols[0][0].symbol.height + 50, this.slot.slotSymbols[0][0].symbol.width + 10);
-            // this.mainContainer.add(this.lineGenerator);
+        // Initialize payLines
+        this.lineGenerator = new LineGenerator(this, this.slot.slotSymbols[0][0].symbol.height + 50, this.slot.slotSymbols[0][0].symbol.width + 10);
+        this.mainContainer.add(this.lineGenerator);
 
         // Initialize UI Popups
         this.uiPopups = new UiPopups(this, this.uiContainer, this.soundManager);
@@ -74,7 +74,7 @@ export default class MainScene extends Scene {
             repeat: -1            // Repeat indefinitely
           });
           // Add a sprite to play the animation
-          const man = this.add.sprite(gameConfig.scale.width/2 + 800, gameConfig.scale.height/ 1.65, 'man0').setScale(0.8);
+          const man = this.add.sprite(gameConfig.scale.width/2 + 800, gameConfig.scale.height/ 1.60, 'man0').setScale(0.85);
           // Play the animation on the sprite
           man.play('monkeySwing');
     }

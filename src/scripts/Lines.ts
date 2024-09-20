@@ -21,7 +21,7 @@ export class LineGenerator extends Phaser.GameObjects.Container {
             this.lineArr.push(line);  // Store reference for later use
         }
 
-        this.setPosition(gameConfig.scale.width / 3.2, gameConfig.scale.height / 2.9);
+        this.setPosition(gameConfig.scale.width / 3.8, gameConfig.scale.height / 2.9);
 
         // Add this Container to the scene
         scene.add.existing(this);
@@ -100,6 +100,7 @@ export class Lines extends Phaser.GameObjects.Container {
         // For left side sprites
         lineSprite = scene.add.sprite(-gameConfig.scale.width / 14, yPosition + 380, `line${index}`);
         lineSprite.setOrigin(0, 0.5);
+        lineSprite.setScale(0.9, 0.9);
         lineSprite.setVisible(false);
 
         return lineSprite;

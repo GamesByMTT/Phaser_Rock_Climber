@@ -9,7 +9,7 @@ export default class Disconnection extends Scene{
     SceneBg!: Phaser.GameObjects.Sprite
     currentPageIndex: number = 0;
     constructor(){
-        super({key: 'InfoScene'})
+        super({key: 'Disconnection'})
     }
     create(){
         const { width, height } = this.cameras.main;
@@ -32,11 +32,6 @@ export default class Disconnection extends Scene{
             // window.parent.postMessage("onExit", "*");   
             // Globals.Socket?.socket.emit("EXIT", {});
         })
-        // this.infoCross.on('pointerdown', ()=>{
-        //     if(Globals.SceneHandler?.getScene("Disconnection")){
-        //         Globals.SceneHandler.removeScene("Disconnection")
-        //     }
-        // });
        
         this.pageviewContainer.add([this.quit, disconnectionText])
     }

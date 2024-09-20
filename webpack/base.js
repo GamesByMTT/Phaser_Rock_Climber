@@ -45,7 +45,7 @@ module.exports = {
         use: {
           loader: 'file-loader',
           options: {
-            name: 'public/src/fonts/Poplar Regular.ttf', // Output fonts in a folder
+            name: 'public/src/fonts/CrashLandingBB_ital.ttf', // Output fonts in a folder
           },
         },
       },
