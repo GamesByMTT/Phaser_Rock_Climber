@@ -8,6 +8,7 @@ import SoundManager from "../scripts/SoundManager";
 import { Howl } from "howler";
 import GambleScene from "./GambleScene";
 import WebFont from "webfontloader";
+import BonusScene from "./BonusScene";
 
 export default class MainLoader extends Scene {
     resources: any;

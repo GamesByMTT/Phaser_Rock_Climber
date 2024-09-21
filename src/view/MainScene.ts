@@ -48,11 +48,9 @@ export default class MainScene extends Scene {
         this.mainContainer.add(this.uiContainer);
         // // Initialize Slots
         this.slot = new Slots(this, this.uiContainer,() => this.onResultCallBack(), this.soundManager);
-        this.mainContainer.add(this.slot);
-
         // Initialize payLines
         this.lineGenerator = new LineGenerator(this, this.slot.slotSymbols[0][0].symbol.height + 50, this.slot.slotSymbols[0][0].symbol.width + 10);
-        this.mainContainer.add(this.lineGenerator);
+        this.mainContainer.add([this.lineGenerator, this.slot]);
 
         // Initialize UI Popups
         this.uiPopups = new UiPopups(this, this.uiContainer, this.soundManager);
@@ -114,13 +112,14 @@ export default class MainScene extends Scene {
      */
     recievedMessage(msgType: string, msgParams: any) {
         if (msgType === 'ResultData') {
-            this.time.delayedCall(1000, () => {    
+            this.time.delayedCall(3000, () => {    
                 if (ResultData.gameData.isBonus) {
-                    this.soundManager.pauseSound("backgroundMusic");
-                    setTimeout(() => {
-                        Globals.SceneHandler?.addScene('BonusScene', BonusScene, true)
-                    }, 600);
-                }         
+                    if(this.uiContainer.isAutoSpinning){
+                        this.uiContainer.autoBetBtn.emit('pointerdown'); 
+                        this.uiContainer.autoBetBtn.emit('pointerup');
+                    }
+                    Globals.SceneHandler?.addScene('BonusScene', BonusScene, true)
+                }        
                 this.uiContainer.currentWiningText.updateLabelText(ResultData.playerData.currentWining.toString());
                 currentGameData.currentBalance = ResultData.playerData.Balance;
                 let betValue = (initData.gameData.Bets[currentGameData.currentBetIndex]) * 20
@@ -159,8 +158,10 @@ export default class MainScene extends Scene {
                    //jackpot Condition
                    this.showWinPopup(winAmount, 'jackpotPopup')
                 }
-                this.slot.stopTween();
             });
+            setTimeout(() => {
+                this.slot.stopTween();
+            }, 1000);
         }
         if(msgType === 'GambleResult'){
             this.uiContainer.currentWiningText.updateLabelText(gambleResult.gamleResultData.currentWining.toString());

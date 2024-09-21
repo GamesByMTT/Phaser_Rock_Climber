@@ -57,7 +57,7 @@ export class UiContainer extends Phaser.GameObjects.Container {
         const container = this.scene.add.container(0, 0);
         const linePanel = this.scene.add.sprite(0, 0, "lines").setDepth(0);
         linePanel.setOrigin(0.5);
-        linePanel.setPosition(linePanel.width * 1.2, gameConfig.scale.height/2 - 100);
+        linePanel.setPosition(linePanel.width * 2.2, gameConfig.scale.height/2 - 100);
         // container.add(lineText);
         this.pBtn = this.createButton('pBtn', gameConfig.scale.width / 2 - this.maxbetBtn.width / 2.15, gameConfig.scale.height - this.maxbetBtn.height * 0.7, () => {
             this.bnuttonMusic("buttonpressed");
@@ -79,7 +79,7 @@ export class UiContainer extends Phaser.GameObjects.Container {
             });
         }).setDepth(0).setScale(0.8);
         container.add(this.pBtn);
-        this.CurrentLineText = new TextLabel(this.scene, linePanel.x, linePanel.y + 55, initData.gameData.Bets[currentGameData.currentBetIndex], 27, "#ffffff");
+        this.CurrentLineText = new TextLabel(this.scene, linePanel.x, linePanel.y, initData.gameData.Bets[currentGameData.currentBetIndex], 27, "#ffffff");
         //Line Count
         container.add(this.CurrentLineText).setDepth(1)
     }

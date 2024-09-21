@@ -105,6 +105,18 @@ export class Slots extends Phaser.GameObjects.Container {
     }
 
     moveReel() {    
+        // this.stopWinningAnimations()
+        // Reset reel positions and symbol states
+        for (let i = 0; i < this.reelContainers.length; i++) {
+            this.reelContainers[i].setPosition(this.reelContainers[i].x, 0); 
+
+            for (let j = 0; j < this.slotSymbols[i].length; j++) {
+                this.slotSymbols[i][j].startMoving = false; 
+                this.slotSymbols[i][j].stopAnimation(); 
+            }
+        }
+
+
         const initialYOffset = (this.slotSymbols[0][0].totalSymbol - this.slotSymbols[0][0].visibleSymbol - this.slotSymbols[0][0].startIndex) * this.slotSymbols[0][0].spacingY;
         setTimeout(() => {
             for (let i = 0; i < this.reelContainers.length; i++) {
@@ -164,8 +176,9 @@ export class Slots extends Phaser.GameObjects.Container {
         this.scene.tweens.add({
             targets: reel,
             y: targetY, // Animate relative to the current position
-            duration: 800,
-            ease: 'Cubic.easeOut',
+            duration: 500,
+            ease: 'Elastic.easeOut',
+            // ease: 'Cubic.easeOut',
             onComplete: () => {
                 if (this.reelTweens[reelIndex]) {
                     this.reelTweens[reelIndex].stop(); 
@@ -205,21 +218,73 @@ export class Slots extends Phaser.GameObjects.Container {
     }
 
     playWinAnimations() {
-       
-        this.resultCallBack(); // Call the result callback
+        this.resultCallBack();
+
         ResultData.gameData.symbolsToEmit.forEach((rowArray: any) => {
             rowArray.forEach((row: any) => {
                 if (typeof row === "string") {
                     const [y, x]: number[] = row.split(",").map((value) => parseInt(value));
-                    const animationId = `symbol_anim_${ResultData.gameData.ResultReel[x][y]}`;
+                    const elementId = ResultData.gameData.ResultReel[x][y];
+
                     if (this.slotSymbols[y] && this.slotSymbols[y][x]) {
                         this.winMusic("winMusic");
-                        this.slotSymbols[y][x].playAnimation(animationId);
+
+                        // Play the regular symbol animation
+                        this.slotSymbols[y][x].playAnimation(`symbol_anim_${elementId}`);
+
+                        // Add winning animation overlay
+                        this.playWinningOverlayAnimation(x, y, elementId); 
                     }
                 }
             });
         });
     }
+
+    playWinningOverlayAnimation(x: number, y: number, elementId: number) {
+        // Calculate the position for the winning animation
+        const winAnimX = this.slotSymbols[y][x].symbol.x;
+        const winAnimY = this.slotSymbols[y][x].symbol.y;
+
+        // Create an array to hold the winning animation frames
+        const winningFrames = [];
+        for (let i = 0; i < 50; i++) { // Assuming you have 50 frames (winning0 to winning49)
+            winningFrames.push({ key: `winning${i}` });
+        }
+
+        this.scene.anims.create({
+            key: `winningAnim_${elementId}`,
+            frames: winningFrames,
+            frameRate: 10,
+            repeat: -1 
+        });
+
+        const targetContainer = this.slotSymbols[y][x].symbol.parentContainer; 
+            // Create the winning sprite and add it to the container
+            const winningSprite = this.scene.add.sprite(winAnimX, winAnimY, `winning0`)
+                .setDepth(12)
+                .setScale(0.8, 0.8)
+                .setName(`winningSprite_${x}_${y}`);
+
+            targetContainer.add(winningSprite); // Add to the container
+
+            winningSprite.play(`winningAnim_${elementId}`);
+    }
+
+    stopWinningAnimations() {
+        for (let i = 0; i < this.slotSymbols.length; i++) {
+            for (let j = 0; j < this.slotSymbols[i].length; j++) {
+                const symbol = this.slotSymbols[i][j];
+                const winningSprite = symbol.symbol.parentContainer.getByName(`winningSprite_${i}_${j}`) as Phaser.GameObjects.Sprite;
+                console.log(winningSprite, "winningSprite");
+                
+                if (winningSprite) {
+                    winningSprite.anims.stop();
+                    winningSprite.destroy();
+                }
+            }
+        }
+    }
+
 
     winMusic(key: string){
         this.SoundManager.playSound(key)

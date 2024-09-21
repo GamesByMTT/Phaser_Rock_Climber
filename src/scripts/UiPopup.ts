@@ -5,6 +5,7 @@ import { TextLabel } from "./TextLabel";
 import { UiContainer } from "./UiContainer";
 import SoundManager from "./SoundManager";
 import InfoScene from "./infoPopup";
+import { text } from "stream/consumers";
 
 const Random = Phaser.Math.Between;
 let musiclevel = 0;
@@ -198,6 +199,7 @@ export class UiPopups extends Phaser.GameObjects.Container {
         .on('pointerdown', () => this.changePage(1));
         this.pageViewContainer.add(nextButton);
     }
+
     changePage(direction: number) {
         const nextPageIndex = this.currentPageIndex + direction;
 
@@ -376,7 +378,7 @@ export class UiPopups extends Phaser.GameObjects.Container {
 
         const quitHeading = this.scene.add.text(-150, -250, "QUIT GAME", {color:"#000000", fontSize: "100px", fontFamily: 'crashLandingItalic', })
         // Add text to the popup
-        const popupText = new TextLabel(this.scene, 0, -45, "Do you really want \n to exit?", 50, "#000000");
+        const popupText = this.scene.add.text(-200, -100, "Do you really want \n to exit?", {color:"#000000", fontSize: "80px", fontFamily: 'crashLandingItalic', align:"center" });
         
         // Yes and No buttons
         const logoutButtonSprite = [
@@ -392,8 +394,8 @@ export class UiPopups extends Phaser.GameObjects.Container {
             Globals.Socket?.socket.emit("EXIT", {});
         }, 0, true);
         const logoutNoButtonSprite = [
-            this.scene.textures.get("noButton"),
-            this.scene.textures.get("noButtonHover")
+            this.scene.textures.get("yesButton"),
+            this.scene.textures.get("yesButtonHover")
         ];
         this.noBtn = new InteractiveBtn(this.scene, logoutNoButtonSprite, () => {
             
@@ -403,12 +405,13 @@ export class UiPopups extends Phaser.GameObjects.Container {
             popupContainer.destroy();
             blurGraphic.destroy(); // Destroy blurGraphic when popup is closed
         }, 0, true);
-       
-        this.yesBtn.setPosition(-130, 80).setScale(0.5, 0.5);
-        this.noBtn.setPosition(130, 80).setScale(0.5, 0.5);;
+        const yesText = this.scene.add.text(-130, 150, "YES", {color:"#000000", fontFamily:"crashLandingItalic", fontSize:"50px"}).setOrigin(0.5)
+        const noText = this.scene.add.text(130, 150, "NO", {color:"#000000", fontFamily:"crashLandingItalic", fontSize:"50px"}).setOrigin(0.5)
+        this.yesBtn.setPosition(-130, 150).setScale(0.8, 0.8);
+        this.noBtn.setPosition(130, 150).setScale(0.8, 0.8);
        
         // Add all elements to popupContainer
-        popupContainer.add([popupBg, popupText, quitHeading, this.yesBtn, this.noBtn]);
+        popupContainer.add([popupBg, popupText, quitHeading, this.yesBtn,yesText, this.noBtn, noText]);
         // Add popupContainer to the scene
         this.scene.add.existing(popupContainer);       
     }

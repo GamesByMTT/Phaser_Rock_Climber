@@ -17,6 +17,8 @@ export default class GambleScene extends Scene {
     isGambleResultRequested: boolean = false; // Flag to ensure the message is sent only once
     doubleButtonText!: Phaser.GameObjects.Text
     collectButtonText!: Phaser.GameObjects.Text
+    riskLogo!: Phaser.GameObjects.Sprite
+    panelBg!:Phaser.GameObjects.Sprite
     constructor() {
         super({ key: 'GambleScene' });
         this.backCards = []; // Initialize the back cards array
@@ -28,7 +30,7 @@ export default class GambleScene extends Scene {
 
         const { width, height } = this.cameras.main;
         this.bonusContainer = this.add.container();
-        this.SceneBg = new Phaser.GameObjects.Sprite(this, width / 2, height / 2, 'Background')
+        this.SceneBg = new Phaser.GameObjects.Sprite(this, width / 2, height / 2, 'GambleBg')
             .setDisplaySize(width, height)
             .setDepth(11)
             .setInteractive();
@@ -37,25 +39,38 @@ export default class GambleScene extends Scene {
             pointer.event.stopPropagation();
         });
 
-        this.winBg = new Phaser.GameObjects.Sprite(this, width / 2, height / 1.2, "winBg");
-        this.DealerCard = new Phaser.GameObjects.Sprite(this, width * 0.15, height / 2, "BackCard1");
+        this.anims.create({
+            key: 'winPanelAnimation',
+            frames: [
+                { key: 'winPanel' },
+                { key: 'winPanel1' }
+            ],
+            frameRate: 2, // Adjust the speed as needed
+            repeat: -1 // Repeat indefinitely
+        });
 
+        this.winBg = new Phaser.GameObjects.Sprite(this, width / 2, height / 1.2, "winPanel").setDisplaySize(384,190);
+        this.DealerCard = new Phaser.GameObjects.Sprite(this, width * 0.15, height / 2, "BackCard1");
+        this.riskLogo = new Phaser.GameObjects.Sprite(this, width/2, height * 0.2, "riskLogo").setScale(0.8, 0.8);
+        this.panelBg = new Phaser.GameObjects.Sprite(this, width * 0.8, height * 0.85, "balancePanel").setDisplaySize(500, 72)
+        const tipsText = new Phaser.GameObjects.Text(this, width * 0.8, height * 0.85, "PICK ONE OF THE THREE CARDS \n TO CHALLENGE DEALER", {color:"#ffffff", fontSize:"20px", align:"center", fontFamily:"Arial"}).setOrigin(0.5)
+        const DealerHeading = new Phaser.GameObjects.Text(this, width * 0.1, height * 0.72, "DEALER", {color: "#ffffff", fontSize:"50px", fontFamily:"Arial"})
+        this.winBg.play('winPanelAnimation');
         // Create back cards and add them to the array
         this.backCards.push(
             this.createBackCard(width / 2.6, height / 2, "BackCard1", 0),
             this.createBackCard(width / 1.8, height / 2, "BackCard2", 1),
             this.createBackCard(width / 1.4, height / 2, "BackCard3", 2)
         );
-        // Initialize currentWinningText with initial value
         this.currentWinningText = this.add.text(
             this.winBg.x, this.winBg.y + 25, // Position over winBg
             `${ResultData.playerData.currentWining}`, // Initial text
             { fontSize: '40px', color: '#ffffff' } // Styling
         ).setOrigin(0.5); // Center the text
         this.bonusContainer.add([
-            this.SceneBg, this.winBg, this.DealerCard, 
+            this.SceneBg, this.riskLogo, this.winBg, this.DealerCard, 
             ...this.backCards,
-            this.currentWinningText // Add the text to the container
+            this.currentWinningText, this.panelBg, tipsText, DealerHeading // Add the text to the container
         ]);
     }
 
@@ -70,7 +85,6 @@ export default class GambleScene extends Scene {
                 setTimeout(() => {
                     this.handleGambleResult(index);
                 }, 300);
-                
             }
         });
 
@@ -94,24 +108,21 @@ export default class GambleScene extends Scene {
             // Player won: Show high card on clicked card and ex cards on the others
             this.flipCard(this.backCards[clickedIndex], gambleData.gambleCards.highCard);
             this.flipCard(this.DealerCard, gambleData.gambleCards.lowCard);
-            this.doubleButton = new Phaser.GameObjects.Sprite(this, gameConfig.scale.width * 0.9, gameConfig.scale.height / 2.5, "Double").setInteractive();
-            this.collecButton = new Phaser.GameObjects.Sprite(this, gameConfig.scale.width * 0.9, gameConfig.scale.height / 1.9, "Double").setInteractive();
-            this.doubleButtonText = this.add.text(this.doubleButton.x - 80, this.doubleButton.y - 20, "DOUBLE", {fontSize: '40px',fontFamily: 'Arial',color:"#ffffff"});
-            this.collectButtonText = this.add.text(this.collecButton.x - 85, this.collecButton.y - 20, "COLLECT",  {fontSize: '40px', fontFamily: 'Arial', color:"#ffffff"})
+            this.doubleButton = new Phaser.GameObjects.Sprite(this, gameConfig.scale.width * 0.9, gameConfig.scale.height / 2.5, "yesButton").setInteractive();
+            this.collecButton = new Phaser.GameObjects.Sprite(this, gameConfig.scale.width * 0.9, gameConfig.scale.height / 1.9, "yesButton").setInteractive();
+            this.doubleButtonText = this.add.text(this.doubleButton.x - 80, this.doubleButton.y - 20, "DOUBLE", {fontFamily:"crashLandingItalic", fontSize:"50px", color:"#000000"});
+            this.collectButtonText = this.add.text(this.collecButton.x - 85, this.collecButton.y - 20, "COLLECT",  {fontFamily:"crashLandingItalic", fontSize:"50px", color:"#000000"})
             this.collecButton.on('pointerdown', () => {
-                console.log("collectButton Press");
-                
                Globals.Socket?.sendMessage("GAMBLECOLLECT", {id: "GamleCollect"});
                 if (Globals.SceneHandler?.getScene("GambleScene")) {
                     Globals.SceneHandler.removeScene("GambleScene");
                 }
             });
-    
             this.doubleButton.on('pointerdown', () => {
                 Globals.Socket?.sendMessage("GambleInit", {id: "GambleInit", GAMBLETYPE: "HIGHCARD"});
                 this.resetCards();
             });
-            this.bonusContainer.add([this.doubleButton, this.collecButton // Add the text to the container
+                this.bonusContainer.add([this.doubleButton, this.collecButton // Add the text to the container
             ]);
         }
         const otherCards = this.backCards.filter((_, idx) => idx !== clickedIndex);
