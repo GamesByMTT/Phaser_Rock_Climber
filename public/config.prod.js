@@ -96,7 +96,7 @@ module.exports = {
             patterns: [
                 { from: 'public/src/sprites', to: 'src/sprites' },
                 { from: 'public/src/sounds', to: 'src/sounds' },
-                { from: 'public/src/sounds', to: 'src/fonts' },
+                { from: 'public/src/fonts', to: 'src/fonts' },
                 { from: 'public/favicon.png', to: 'favicon.png' },
                 { from: 'public/style.css', to: 'style.css' }
             ],
