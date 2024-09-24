@@ -110,8 +110,8 @@ export default class GambleScene extends Scene {
             this.flipCard(this.DealerCard, gambleData.gambleCards.lowCard);
             this.doubleButton = new Phaser.GameObjects.Sprite(this, gameConfig.scale.width * 0.9, gameConfig.scale.height / 2.5, "yesButton").setInteractive();
             this.collecButton = new Phaser.GameObjects.Sprite(this, gameConfig.scale.width * 0.9, gameConfig.scale.height / 1.9, "yesButton").setInteractive();
-            this.doubleButtonText = this.add.text(this.doubleButton.x - 80, this.doubleButton.y - 20, "DOUBLE", {fontFamily:"crashLandingItalic", fontSize:"50px", color:"#000000"});
-            this.collectButtonText = this.add.text(this.collecButton.x - 85, this.collecButton.y - 20, "COLLECT",  {fontFamily:"crashLandingItalic", fontSize:"50px", color:"#000000"})
+            this.doubleButtonText = this.add.text(this.doubleButton.x - 80, this.doubleButton.y - 40, "DOUBLE", {fontFamily:"crashLandingItalic", fontSize:"70px", color:"#000000"});
+            this.collectButtonText = this.add.text(this.collecButton.x - 85, this.collecButton.y - 40, "COLLECT",  {fontFamily:"crashLandingItalic", fontSize:"70px", color:"#000000"})
             this.collecButton.on('pointerdown', () => {
                Globals.Socket?.sendMessage("GAMBLECOLLECT", {id: "GamleCollect"});
                 if (Globals.SceneHandler?.getScene("GambleScene")) {
@@ -139,7 +139,6 @@ export default class GambleScene extends Scene {
     }
 
     flipCard(card: Phaser.GameObjects.Sprite, newCardData: any) {
-        this.SoundManager.playSound("cardMusic")
         this.tweens.add({
             targets: card,
             scaleX: 0, // Flip halfway

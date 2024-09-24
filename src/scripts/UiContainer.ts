@@ -134,8 +134,6 @@ export class UiContainer extends Phaser.GameObjects.Container {
     spinBtnInit(spinCallBack: () => void) {
         this.spinBtn = new Phaser.GameObjects.Sprite(this.scene, 0, 0, "spinBtn");
         this.spinBtn = this.createButton('spinBtn', gameConfig.scale.width / 1.2, gameConfig.scale.height/1.1, () => {
-            // this.spinButtonSound = this.scene.sound.add("spinButton", {loop: false, volume: 0.8})
-            // this.spinButtonSound.play();
                 this.bnuttonMusic("spinButton");
                 if(this.doubleButton){
                     this.doubleButton.destroy();   
@@ -399,7 +397,6 @@ export class UiContainer extends Phaser.GameObjects.Container {
         this.SoundManager.playSound(key)
     }
     update() {
-        // Check the value of this.currentWiningText.text
         if (parseFloat(this.currentWiningText.text) > 0) {
             // If doubleButton does not exist, create it
             if (!this.doubleButton || this.doubleButton.scene == undefined) {
@@ -437,7 +434,6 @@ export class UiContainer extends Phaser.GameObjects.Container {
                 this.fadeDoubbleBtn()
             }
             if (this.doubleButton) {
-                // Stop all tweens associated with doubleButton
                 this.scene.tweens.killTweensOf(this.doubleButton);
                 this.doubleButton.destroy(); 
             }

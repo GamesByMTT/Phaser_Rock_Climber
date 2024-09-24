@@ -116,7 +116,6 @@ export default class BonusScene extends Scene {
 
         const animSprite = this.add.sprite(x, y, clickAnimationFrames[0]).setDepth(12); 
         let finalFramePosition = { x, y };
-        this.SoundManager.playSound("coconutFall");
     
         this.tweens.addCounter({
             from: 0,

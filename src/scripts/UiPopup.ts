@@ -8,7 +8,6 @@ import InfoScene from "./infoPopup";
 import { text } from "stream/consumers";
 
 const Random = Phaser.Math.Between;
-let musiclevel = 0;
 export class UiPopups extends Phaser.GameObjects.Container {
     SoundManager: SoundManager;
     UiContainer: UiContainer
@@ -246,87 +245,122 @@ export class UiPopups extends Phaser.GameObjects.Container {
      * 
      */
     openSettingPopup() {
-        const settingblurGraphic = this.scene.add.graphics().setDepth(1); // Set depth lower than popup elements
-        settingblurGraphic.fillStyle(0x000000, 0.5); // Black with 50% opacity
-        settingblurGraphic.fillRect(0, 0, this.scene.scale.width, this.scene.scale.height); // Cover entire screen
-
+        const settingblurGraphic = this.scene.add.graphics().setDepth(1);
+        settingblurGraphic.fillStyle(0x000000, 0.5);
+        settingblurGraphic.fillRect(0, 0, this.scene.scale.width, this.scene.scale.height);
+        const numSteps = 10; // 10 steps for 0.0 to 1.0
+        let soundLevel = 5; // Initial sound level (0 to 9)
+        let musicLevel = 5; // Initial music level (0 to 9)
         const infopopupContainer = this.scene.add.container(
             this.scene.scale.width / 2,
             this.scene.scale.height / 2
         ).setDepth(1);
-        
+    
         const popupBg = this.scene.add.image(0, 0, 'messagePopup').setDepth(9);
-        const settingText = this.scene.add.image(0, -330, 'settingText').setScale(0.6)
-        const soundsImage = this.scene.add.image(-450, -120, 'soundImage').setDepth(10).setScale(0.7);
-        const musicImage = this.scene.add.image(-450, 80, 'musicImage').setDepth(10).setScale(0.7);
-        const soundProgreesBar = this.scene.add.image(40, -100, 'sounProgress')
-        const musicProgreesBar = this.scene.add.image(40,100, 'sounProgress')
-        const sounPlus = this.scene.add.image(420, 40, 'soundPlus').setInteractive()
-        const soundMinus = this.scene.add.image(-330, 40, 'soundMinus').setInteractive()
-        const sounPlusOne = this.scene.add.image(420, -160, 'soundPlus').setInteractive()
-        const soundMinusOne = this.scene.add.image(-330, -160, 'soundMinus').setInteractive()
+        const settingText = this.scene.add.text(-100, -290, 'SETTINGS', {color: "#000000", fontSize: "100px", fontFamily: 'crashLandingItalic'});
+        const soundsImage = this.scene.add.image(-270, -100, 'soundImage').setDepth(10).setScale(0.7);
+        const musicImage = this.scene.add.image(-270, 100, 'musicImage').setDepth(10).setScale(0.7);
+        const soundProgreesBar = this.scene.add.image(40, -100, 'sounProgress');
+        const musicProgreesBar = this.scene.add.image(40, 100, 'sounProgress');
+        const volume0 = this.scene.add.text(-250, -190, "0%", {color: "#616d77", fontSize: "40px", fontFamily: 'crashLandingItalic'});
+        const volume100 = this.scene.add.text(270, -190, "100%", {color: "#616d77", fontSize: "40px", fontFamily: 'crashLandingItalic'});
+        const musicVolume0 = this.scene.add.text(-250, 10, "0%", {color: "#616d77", fontSize: "40px", fontFamily: 'crashLandingItalic'});
+        const musicVolume100 = this.scene.add.text(270, 10, "100%", {color: "#616d77", fontSize: "40px", fontFamily: 'crashLandingItalic'});
+    
+        const soundLevelIndicator = this.scene.add.image(40, -100, 'indicatorSprite')
+        .setDepth(11)
+        .setInteractive({ draggable: true });
+        const musicLevelIndicator = this.scene.add.image(40, 100, 'indicatorSprite')
+        .setDepth(11)
+        .setInteractive({ draggable: true });
 
-        // New sprite for sound level indicator
-        const soundLevelIndicator = this.scene.add.image(40, -100, 'indicatorSprite').setDepth(11).setInteractive();
-        const musicLevelIndicator = this.scene.add.image(40, 100, 'indicatorSprite').setDepth(11).setInteractive();
+        const getStepIndex = (pointerX: number, progressBar: Phaser.GameObjects.Image): number => {
+            const sectionWidth = progressBar.width / numSteps;
+            const relativeX = pointerX - progressBar.x; 
+            return Phaser.Math.Clamp(Math.round(relativeX / sectionWidth), 0, numSteps - 1);
+        };
+    
+        // soundLevelIndicator.x = soundProgreesBar.x + (soundProgreesBar.width * soundLevel) - soundProgreesBar.width / 2;
+        // musicLevelIndicator.x = musicProgreesBar.x + (musicProgreesBar.width * musicLevel) - musicProgreesBar.width / 2;
 
-        // Configure initial positions based on current sound levels
-        let soundLevel = 0.5; // Example: start at 50%
-        let musicLevel = 0.5; // Example: start at 50%
+        // Function to update sound level and indicator position
+        const updateSoundLevel = (pointerX: number) => {
+            const newSoundLevel = getStepIndex(pointerX, soundProgreesBar);
+    
+            // Only update if the level has actually changed
+            if (newSoundLevel !== soundLevel) {
+                // Move one step at a time
+                soundLevel = Phaser.Math.Clamp(newSoundLevel, soundLevel - 1, soundLevel + 1);
+    
+                // Calculate and set the new indicator position
+                const newX = soundProgreesBar.x + (soundLevel * soundProgreesBar.width / numSteps) - soundProgreesBar.width / 2;
+    
+                // Use a tween to animate the indicator's snapping
+                this.scene.tweens.add({
+                    targets: soundLevelIndicator,
+                    x: newX,
+                    duration: 100, // Adjust duration as needed
+                    ease: 'Cubic.easeOut', // Adjust easing as needed
+                    onComplete: () => {
+                        // Update actual sound volume (0.0 to 1.0) AFTER snapping
+                        const normalizedSoundLevel = soundLevel / (numSteps - 1); 
+                        console.log("Sound Level:", normalizedSoundLevel);
+                        // Example: this.scene.sound.setVolume(normalizedSoundLevel);
+                    }
+                });
+            }
+        };
+    
+        const updateMusicLevel = (pointerX: number) => {
+            const newMusicLevel = getStepIndex(pointerX, musicProgreesBar);
+    
+            if (newMusicLevel !== musicLevel) {
+                musicLevel = newMusicLevel;
+                const newX = musicProgreesBar.x + (musicLevel * musicProgreesBar.width / numSteps) - musicProgreesBar.width / 2;
+                musicLevelIndicator.x = newX;
+    
+                // Update actual music volume (0.0 to 1.0)
+                const normalizedMusicLevel = musicLevel / (numSteps - 1);
+                console.log("Music Level:", normalizedMusicLevel);
+                // Example: this.scene.sound.setMusicVolume(normalizedMusicLevel);
+            }
+        };
+        
+         // Set initial indicator positions (start at 0.0)
+        soundLevelIndicator.x = soundProgreesBar.x - soundProgreesBar.width / 2;
+        musicLevelIndicator.x = musicProgreesBar.x - musicProgreesBar.width / 2;
 
-        // Set initial position of indicators
-        soundLevelIndicator.x = soundProgreesBar.x + (soundProgreesBar.width * soundLevel - soundProgreesBar.width / 1.5);
-        musicLevelIndicator.x = musicProgreesBar.x + (musicProgreesBar.width * musicLevel - musicProgreesBar.width / 2.5);
-
+        let isDraggingSound = false;
+        let isDraggingMusic = false;
+    
+        soundLevelIndicator.on('drag', (pointer: Phaser.Input.Pointer) => {
+            updateSoundLevel(pointer.x);
+        });
+    
+        musicLevelIndicator.on('drag', (pointer: Phaser.Input.Pointer) => {
+            updateMusicLevel(pointer.x);
+        });
+    
         const exitButtonSprites = [
-            this.scene.textures.get('crossButton'),
-            this.scene.textures.get('crossButtonHover')
+            this.scene.textures.get('infoCross'),
+            this.scene.textures.get('infoCross')
         ];
+        
         this.settingClose = new InteractiveBtn(this.scene, exitButtonSprites, () => {
             infopopupContainer.destroy();
             settingblurGraphic.destroy();
-            this.buttonMusic("buttonpressed")
+            this.buttonMusic("buttonpressed");
         }, 0, true);
-        this.settingClose.setPosition(500, -200).setScale(0.8);
-
+        
+        this.settingClose.setPosition(430, -300).setScale(0.8);
+    
         popupBg.setOrigin(0.5);
-        popupBg.setScale(0.9)
-        popupBg.setAlpha(1); // Set background transparency
-        infopopupContainer.add([popupBg, settingText, this.settingClose, soundsImage, musicImage, soundProgreesBar, musicProgreesBar, sounPlusOne, soundMinusOne, sounPlus, soundMinus, soundLevelIndicator, musicLevelIndicator]);
-         // Add interactivity to plus and minus buttons for sound
-        sounPlus.on('pointerdown', () => {
-            if (soundLevel < 1) {
-                soundLevel += 0.1; // Increase sound level
-                this.adjustSoundVolume(soundLevel); // Adjust sound volume function
-                musicLevelIndicator.x = musicProgreesBar.x + ((musicProgreesBar.width * soundLevel) - musicProgreesBar.width / 1.5);
-            }
-        });
-
-        soundMinus.on('pointerdown', () => {
-            if (soundLevel > 0) {
-                soundLevel -= 0.1; // Decrease sound level
-                this.adjustSoundVolume(soundLevel); // Adjust sound volume function
-                musicLevelIndicator.x = musicProgreesBar.x + ((musicProgreesBar.width * soundLevel) - musicProgreesBar.width / 2.5);
-            }
-        });
-
-        // Add interactivity to plus and minus buttons for music
-        sounPlusOne.on('pointerdown', () => {
-            if (musicLevel < 1) {
-                musicLevel += 0.1; // Increase music level
-                this.adjustMusicVolume(musicLevel); // Adjust music volume function
-                soundLevelIndicator.x = soundProgreesBar.x + (soundProgreesBar.width * musicLevel - soundProgreesBar.width / 1.5);
-            }
-        });
-
-        soundMinusOne.on('pointerdown', () => {
-            if (musicLevel > 0) {
-                musicLevel -= 0.1; // Decrease music level
-                this.adjustMusicVolume(musicLevel); // Adjust music volume function
-                soundLevelIndicator.x = musicProgreesBar.x + (soundProgreesBar.width * musicLevel - soundProgreesBar.width / 2.5);
-            }
-        });
-}
+        popupBg.setScale(0.9);
+        popupBg.setAlpha(1);
+        
+        infopopupContainer.add([popupBg, settingText, this.settingClose, soundsImage, musicImage, soundProgreesBar, musicProgreesBar, volume0, volume100, musicVolume0, musicVolume100, soundLevelIndicator, musicLevelIndicator]);
+    }
+    
 
     // Function to adjust sound volume
     adjustSoundVolume(level:number) {
@@ -405,8 +439,8 @@ export class UiPopups extends Phaser.GameObjects.Container {
             popupContainer.destroy();
             blurGraphic.destroy(); // Destroy blurGraphic when popup is closed
         }, 0, true);
-        const yesText = this.scene.add.text(-130, 150, "YES", {color:"#000000", fontFamily:"crashLandingItalic", fontSize:"50px"}).setOrigin(0.5)
-        const noText = this.scene.add.text(130, 150, "NO", {color:"#000000", fontFamily:"crashLandingItalic", fontSize:"50px"}).setOrigin(0.5)
+        const yesText = this.scene.add.text(-130, 140, "YES", {color:"#000000", fontFamily:"crashLandingItalic", fontSize:"50px"}).setOrigin(0.5)
+        const noText = this.scene.add.text(130, 140, "NO", {color:"#000000", fontFamily:"crashLandingItalic", fontSize:"50px"}).setOrigin(0.5)
         this.yesBtn.setPosition(-130, 150).setScale(0.8, 0.8);
         this.noBtn.setPosition(130, 150).setScale(0.8, 0.8);
        

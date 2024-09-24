@@ -145,18 +145,12 @@ export default class MainScene extends Scene {
                     // If count is 1 or less, ensure text is scaled normally
                     this.uiContainer.freeSpininit(freeSpinCount)
                 }
-                if (winAmount >= 10 * betValue && winAmount < 15 * betValue) {
-                 // Big Win Popup
-                 this.showWinPopup(winAmount, 'bigWinPopup')
-                } else if (winAmount >= 15 * betValue && winAmount < 20 * betValue) {
+                if (winAmount >= 15 * betValue && winAmount < 20 * betValue) {
                     // HugeWinPopup
                     this.showWinPopup(winAmount, 'hugeWinPopup')
                 } else if (winAmount >= 20 * betValue && winAmount < 25 * betValue) {
                     //MegawinPopup
                     this.showWinPopup(winAmount, 'megaWinPopup')
-                } else if(jackpot > 0) {
-                   //jackpot Condition
-                   this.showWinPopup(winAmount, 'jackpotPopup')
                 }
             });
             setTimeout(() => {
@@ -176,28 +170,56 @@ export default class MainScene extends Scene {
      */
     showWinPopup(winAmount: number, spriteKey: string) {
         // Create the popup background
-        const inputOverlay = this.add.rectangle(0, 0, this.cameras.main.width, this.cameras.main.height, 0x000000, 0.5)
+        const inputOverlay = this.add.rectangle(0, 0, this.cameras.main.width, this.cameras.main.height, 0x000000, 0.7)
         .setOrigin(0, 0)
         .setDepth(9) // Set depth to be below the popup but above game elements
         .setInteractive() // Make it interactive to block all input events
         inputOverlay.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
-            // Prevent default action on pointerdown to block interaction
             pointer.event.stopPropagation();
         });
 
-        const winBg = this.add.sprite(gameConfig.scale.width/2, gameConfig.scale.height/2, "winningBg").setDepth(11).setOrigin(0.5)
+        const megaWinBg = this.add.sprite(gameConfig.scale.width / 2, gameConfig.scale.height / 2, "megawinAnimBg")
+        .setDepth(10)
+        .setOrigin(0.5);
 
-        // Create the sprite based on the key provided
-        const winSprite = this.add.sprite(this.cameras.main.centerX, this.cameras.main.centerY - 50, spriteKey).setDepth(11).setScale(0.8);
-        const winAmountPanel = this.add.sprite(gameConfig.scale.width/2, gameConfig.scale.height/2 + 300, "winAmountPanel").setDepth(11).setScale(0.4)
-        // winAmountPanel.setPosition()
-        winAmountPanel.setOrigin(0.5)
+        // this.tweens.add({
+        //     targets: megaWinBg,
+        //     scale: 1.2, // Scale up a bit 
+        //     duration: 500, 
+        //     yoyo: true, 
+        //     repeat: -1, 
+        //     ease: 'Sine.easeInOut'
+        // });
+        const megaWinStar = this.add.sprite(gameConfig.scale.width / 2, gameConfig.scale.height / 2, "megawinStar")
+            .setDepth(12) // Ensure it's above the rotating background
+            .setOrigin(0.5)
+            .setScale(0); // Start hidden (scaled down)
 
-        // Create the text object to display win amount
-        const winText = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY + 300, '0', {
-            font: '45px',
-            color: '#FFFFFF'
-        }).setDepth(11).setOrigin(0.5);
+        this.tweens.add({
+            targets: megaWinStar,
+            scale: 1,  
+            duration: 500,
+            yoyo: true, 
+            repeat: -1,
+            ease: 'Sine.easeInOut',
+            delay: 250 // Start after half of megaWinBg's animation 
+        });
+
+        const coinFrames = [];
+        for (let i = 0; i < 19; i++) { // Assuming you have 50 frames (winning0 to winning49)
+            coinFrames.push({ key: `coin${i}` });
+        }
+        this.anims.create({
+            key: `coinFlip`,
+            frames: coinFrames,
+            frameRate: 10,
+            repeat: -1 
+        });
+        const winningSprite = this.add.sprite(gameConfig.scale.width / 4, gameConfig.scale.height * 0.8, `coin0`).setDepth(13).setScale(0.7)
+        winningSprite.play('coinFlip')
+        
+        const winSprite = this.add.sprite(this.cameras.main.centerX, this.cameras.main.centerY - 50, spriteKey).setScale(0.8);
+        winSprite.setDepth(13)
 
         // Tween to animate the text increment from 0 to winAmount
         this.tweens.addCounter({
@@ -206,16 +228,18 @@ export default class MainScene extends Scene {
             duration: 1000, // Duration of the animation in milliseconds
             onUpdate: (tween) => {
                 const value = Math.floor(tween.getValue());
-                winText.setText(value.toString());
+               
             },
             onComplete: () => {
                 // Automatically close the popup after a few seconds
                 this.time.delayedCall(4000, () => {
                     inputOverlay.destroy();
-                    winBg.destroy();
-                    winAmountPanel.destroy();
-                    winText.destroy();
+                    // winBg.destroy();
+                    megaWinBg.destroy();
+                    megaWinStar.destroy();
                     winSprite.destroy();
+                    winningSprite.stop()
+                    winningSprite.destroy();
                 });
             }
         });
@@ -236,10 +260,8 @@ export default class MainScene extends Scene {
         .setDepth(9) // Set depth to be below the popup but above game elements
         .setInteractive() // Make it interactive to block all input events
         inputOverlay.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
-            // Prevent default action on pointerdown to block interaction
             pointer.event.stopPropagation();
         });
-        // Create the sprite based on the key provided
         const winSprite = this.add.sprite(this.cameras.main.centerX, this.cameras.main.centerY, spriteKey).setDepth(11);
         if(!this.uiContainer.isAutoSpinning){
           

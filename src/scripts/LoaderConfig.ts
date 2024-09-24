@@ -61,6 +61,26 @@ export const LoaderConfig = {
     infoCross: "src/sprites/infoCross.png",
     disconnectClose: "src/sprites/closeButton.png",
 
+    coin0: "src/sprites/coin1.png",
+    coin1: "src/sprites/coin2.png",
+    coin2: "src/sprites/coin3.png",
+    coin3: "src/sprites/coin4.png",
+    coin4: "src/sprites/coin5.png",
+    coin5: "src/sprites/coin6.png",
+    coin6: "src/sprites/coin7.png",
+    coin7: "src/sprites/coin8.png",
+    coin8: "src/sprites/coin9.png",
+    coin9: "src/sprites/coin10.png",
+    coin10: "src/sprites/coin11.png",
+    coin11: "src/sprites/coin12.png",
+    coin12: "src/sprites/coin13.png",
+    coin13: "src/sprites/coin14.png",
+    coin14: "src/sprites/coin15.png",
+    coin15: "src/sprites/coin16.png",
+    coin16: "src/sprites/coin17.png",
+    coin17: "src/sprites/coin18.png",
+    coin18: "src/sprites/coin19.png",
+
     assetsloader: "src/sprites/assetsloader.png",
     loaderBg: "src/sprites/loaderBg.png",
     reelBg: "src/sprites/reelBg.png",   
@@ -414,6 +434,9 @@ export const LoaderConfig = {
     slots7_0 :  "/src/sprites/Symbols/icon8/icon_8.png",
     slots8_0 :  "/src/sprites/Symbols/icon9/Bonus.png",
 
+    megawinAnimBg: "src/sprites/rays.png",
+    megawinStar: "src/sprites/stars.png",
+
     man0: "src/sprites/man0.png",
     man1: "src/sprites/man1.png",
     man2: "src/sprites/man2.png",
@@ -513,13 +536,10 @@ export const LoaderSoundConfig: any = {
         backgroundMusic: "src/sounds/Teaser.mp3",
         onSpin :  "/src/sounds/slot-machine-loop.mp3",
         spinButton: "src/sounds/spin.wav",
-        winMusic: "src/sounds/JackpotWinner.mp3",
-        buttonpressed: "src/sounds/Game-Button.mp3",
-        spinWheelMusic: "src/sounds/spinWheel.mp3",
-        bonusBg: "src/sounds/bonusbg.wav",
-        bonuswin: "src/sounds/bonuswin.wav",
-        cardMusic: "src/sounds/card.mp3",
-        coconutFall: "src/sounds/coconutfall.wav"
+        winMusic: "src/sounds/JackpotWinner.wav",
+        buttonpressed: "src/sounds/Game-Button.wav",
+        bonusBg: "src/sounds/bonusbg.mp3",
+        bonuswin: "src/sounds/bonuswin.mp3",
  
 };
 

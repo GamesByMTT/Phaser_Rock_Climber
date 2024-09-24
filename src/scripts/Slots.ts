@@ -105,17 +105,28 @@ export class Slots extends Phaser.GameObjects.Container {
     }
 
     moveReel() {    
-        // this.stopWinningAnimations()
-        // Reset reel positions and symbol states
-        for (let i = 0; i < this.reelContainers.length; i++) {
-            this.reelContainers[i].setPosition(this.reelContainers[i].x, 0); 
 
+        for (let i = 0; i < this.slotSymbols.length; i++) {
             for (let j = 0; j < this.slotSymbols[i].length; j++) {
-                this.slotSymbols[i][j].startMoving = false; 
-                this.slotSymbols[i][j].stopAnimation(); 
+                const symbol = this.slotSymbols[i][j];
+                if (symbol.winningSprite) {
+                    symbol.winningSprite.anims.stop();
+                    symbol.winningSprite.destroy();
+                    symbol.winningSprite = null; // Clear the reference
+                }
             }
         }
 
+         ResultData.gameData.symbolsToEmit.forEach((rowArray: any) => {
+            rowArray.forEach((row: any) => {
+                if (typeof row === "string") {
+                    const [y, x] = row.split(",").map((value) => parseInt(value));
+                    if (this.slotSymbols[y] && this.slotSymbols[y][x]) {
+                        this.slotSymbols[y][x].stopAnimation(); 
+                    }
+                }
+            });
+        });
 
         const initialYOffset = (this.slotSymbols[0][0].totalSymbol - this.slotSymbols[0][0].visibleSymbol - this.slotSymbols[0][0].startIndex) * this.slotSymbols[0][0].spacingY;
         setTimeout(() => {
@@ -127,15 +138,6 @@ export class Slots extends Phaser.GameObjects.Container {
             }    
         }, 100);
          
-        for (let i = 0; i < this.reelContainers.length; i++) {
-            for (let j = 0; j < this.reelContainers[i].list.length; j++) {
-                setTimeout(() => {
-                    this.slotSymbols[i][j].startMoving = true;
-                    if (j < 3) this.slotSymbols[i][j].stopAnimation();
-                }, 100 * i);
-            }
-        }
-       
         this.moveSlots = true;
         setTimeout(() => {
             for (let i = 0; i < this.reelContainers.length; i++) {
@@ -168,6 +170,23 @@ export class Slots extends Phaser.GameObjects.Container {
         });
     }
 
+    showDisconnectionScene(){
+        Globals.SceneHandler?.addScene("Disconnection", Disconnection, true)
+    }
+
+    update(time: number, delta: number) {
+        if (this.slotSymbols && this.moveSlots) {
+            for (let i = 0; i < this.reelContainers.length; i++) {
+            }
+        }
+    }
+    
+    stopTween() {
+        for (let i = 0; i < this.reelContainers.length; i++) { 
+            this.stopReel(i);   
+        }
+    }
+
     stopReel(reelIndex: number) {
         const reel = this.reelContainers[reelIndex];
         const reelDelay = 300 * (reelIndex + 1);
@@ -198,24 +217,6 @@ export class Slots extends Phaser.GameObjects.Container {
             this.slotSymbols[reelIndex][j].endTween();
          }
     } 
-
-    showDisconnectionScene(){
-        Globals.SceneHandler?.addScene("Disconnection", Disconnection, true)
-    }
-
-    update(time: number, delta: number) {
-        if (this.slotSymbols && this.moveSlots) {
-            for (let i = 0; i < this.reelContainers.length; i++) {
-            }
-        }
-    }
-
-    
-    stopTween() {
-        for (let i = 0; i < this.reelContainers.length; i++) { 
-            this.stopReel(i);   
-        }
-    }
 
     playWinAnimations() {
         this.resultCallBack();
@@ -267,6 +268,8 @@ export class Slots extends Phaser.GameObjects.Container {
 
             targetContainer.add(winningSprite); // Add to the container
 
+            this.slotSymbols[y][x].winningSprite = winningSprite; 
+
             winningSprite.play(`winningAnim_${elementId}`);
     }
 
@@ -276,7 +279,6 @@ export class Slots extends Phaser.GameObjects.Container {
                 const symbol = this.slotSymbols[i][j];
                 const winningSprite = symbol.symbol.parentContainer.getByName(`winningSprite_${i}_${j}`) as Phaser.GameObjects.Sprite;
                 console.log(winningSprite, "winningSprite");
-                
                 if (winningSprite) {
                     winningSprite.anims.stop();
                     winningSprite.destroy();
@@ -284,8 +286,7 @@ export class Slots extends Phaser.GameObjects.Container {
             }
         }
     }
-
-
+ 
     winMusic(key: string){
         this.SoundManager.playSound(key)
     }
@@ -307,7 +308,7 @@ class Symbols {
     private isMobile: boolean;
     reelContainer: Phaser.GameObjects.Container
     private bouncingTween: Phaser.Tweens.Tween | null = null;
-
+    winningSprite: Phaser.GameObjects.Sprite | null = null; 
     constructor(scene: Phaser.Scene, symbolKey: string, index: { x: number; y: number }, reelContainer: Phaser.GameObjects.Container) {
         this.scene = scene;
         this.index = index;
@@ -347,8 +348,13 @@ class Symbols {
         this.symbol.play(animationId)
     }
     stopAnimation() {
-        this.symbol.anims.stop();
-        this.symbol.setFrame(0);
+        // console.log(this.symbol.anims.isPlaying);
+        if (this.symbol.anims.isPlaying) {
+            this.symbol.anims.stop();
+            // this.symbol.setFrame(0);
+        } else {
+            // console.log("Animation is not playing on this symbol.");
+        }
     }
     endTween() {
         if (this.index.y < 3) {
@@ -374,6 +380,7 @@ class Symbols {
                     // Set the texture to the first key and start the animation
                         this.symbol.setTexture(textureKeys[0]);           
                     }
+                    this.startMoving = true; 
         }
         // Stop moving and start tweening the sprite's position
         this.scene.time.delayedCall(10, () => { // Example: 50ms delay

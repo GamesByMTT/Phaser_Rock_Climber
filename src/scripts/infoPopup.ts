@@ -25,11 +25,11 @@ export default class InfoScene extends Scene{
             pointer.event.stopPropagation();
         })
         this.pageviewContainer = this.add.container();
-        this.popupBackground = new Phaser.GameObjects.Sprite(this, gameConfig.scale.width/2, gameConfig.scale.height/2, "PopupBackground").setScale(0.27);
+        this.popupBackground = new Phaser.GameObjects.Sprite(this, gameConfig.scale.width/2, gameConfig.scale.height/2, "PopupBackground");
         this.pageviewContainer.add(this.popupBackground)
         this.leftArrow = new Phaser.GameObjects.Sprite(this, 300, gameConfig.scale.height/2, "leftArrow").setInteractive();
         this.rightArrow = new Phaser.GameObjects.Sprite(this, 1600, gameConfig.scale.height/2, "rightArrow").setInteractive();
-        this.infoCross = new Phaser.GameObjects.Sprite(this, 1600, gameConfig.scale.height/2-400, "infoCross").setInteractive().setScale(0.2)
+        this.infoCross = new Phaser.GameObjects.Sprite(this, 1550, gameConfig.scale.height/2-300, "infoCross").setInteractive().setScale(0.8)
         this.infoCross.on('pointerdown', ()=>{
             if(Globals.SceneHandler?.getScene("InfoScene")){
                 Globals.SceneHandler.removeScene("InfoScene")
@@ -53,24 +53,24 @@ export default class InfoScene extends Scene{
     createPages() {
         // Create pages and add content
         this.pages[1] = this.add.container(0, 0);
-        const symbol1 = this.add.sprite(450, 300, "inofIcon1").setScale(0.22)
-        const symbol2 = this.add.sprite(750, 300, "inofIcon2").setScale(0.22)
-        const symbol3 = this.add.sprite(1050, 300, "inofIcon3").setScale(0.22)
-        const symbol4 = this.add.sprite(1350, 300, "inofIcon4").setScale(0.22)
-        const symbol5 = this.add.sprite(450, 500, "inofIcon5").setScale(0.22)
-        const symbol6 = this.add.sprite(750, 500, "inofIcon6").setScale(0.22)
-        const symbol7 = this.add.sprite(1050, 500, "inofIcon7").setScale(0.22)
-        const symbol8 = this.add.sprite(1350, 500, "inofIcon8").setScale(0.22)
+        const symbol1 = this.add.sprite(450, 400, "inofIcon1").setScale(0.85)
+        const symbol2 = this.add.sprite(750, 400, "inofIcon2").setScale(0.85)
+        const symbol3 = this.add.sprite(1050, 400, "inofIcon3").setScale(0.85)
+        const symbol4 = this.add.sprite(1350, 400, "inofIcon4").setScale(0.85)
+        const symbol5 = this.add.sprite(450, 600, "inofIcon5").setScale(0.85)
+        const symbol6 = this.add.sprite(750, 600, "inofIcon6").setScale(0.85)
+        const symbol7 = this.add.sprite(1050, 600, "inofIcon7").setScale(0.85)
+        const symbol8 = this.add.sprite(1350, 600, "inofIcon8").setScale(0.85)
         console.log(initData.UIData.symbols[0], "initData.UIData.symbols[0]");
         const infoIcons = [
-            { x: 540, y: 300 }, // Position for infoIcon2
-            { x: 840, y: 300 }, // Position for infoIcon3
-            { x: 1140, y: 300 }, //
-            { x: 1440, y: 300 }, //
-            { x: 540, y: 500 }, //
-            { x: 840, y: 500 }, //
-            { x: 1140, y: 500 }, //
-            { x: 1440, y: 500 }, //
+            { x: 540, y: 400 }, // Position for infoIcon2
+            { x: 840, y: 400 }, // Position for infoIcon3
+            { x: 1140, y: 400 }, //
+            { x: 1440, y: 400 }, //
+            { x: 540, y: 600 }, //
+            { x: 840, y: 600 }, //
+            { x: 1140, y: 600 }, //
+            { x: 1440, y: 600 }, //
         ]
 
          initData.UIData.symbols.forEach((symbol, symbolIndex) => {
@@ -86,15 +86,16 @@ export default class InfoScene extends Scene{
                     const multiplierValue = multiplierValueArray[0];
                     if (multiplierValue > 0) {  // Skip the loop iteration if multiplierValue is 0
                         // Determine the text (e.g., '5x', '4x', '2x')
-                        const prefix = [5, 4, 3][multiplierIndex]; // Customize this if needed
+                        // const prefix = [5, 4, 3][multiplierIndex]; // Customize this if needed
+                        const prefix = (5 - multiplierIndex) + "x"; // No need for an array lookup
                         // console.log(multiplierValue, "multiplierValue");
-                        let text = `${multiplierValue} \n`;            
+                        let text = `${prefix} - ${multiplierValue} \n`;            
                         // Create the text object
                         const textObject = this.add.text(
                             iconPosition.x, // X position (you might want to offset this)
                             iconPosition.y + multiplierIndex * 60, // Y position (spacing between lines)
                             text,
-                            { fontFamily: "Poplar Regular", fontSize: '30px', color: '#fff' } // Customize text style
+                            { fontFamily: "crashLandingItalic", fontSize: '40px', color: '#fff' } // Customize text style
                         );
                         // Optionally adjust the position further based on requirements
                         textObject.setLineSpacing(100)
