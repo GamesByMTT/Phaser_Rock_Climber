@@ -245,7 +245,7 @@ export class UiPopups extends Phaser.GameObjects.Container {
      * 
      */
     openSettingPopup() {
-        const settingblurGraphic = this.scene.add.graphics().setDepth(1);
+        const settingblurGraphic = this.scene.add.graphics();
         settingblurGraphic.fillStyle(0x000000, 0.5);
         settingblurGraphic.fillRect(0, 0, this.scene.scale.width, this.scene.scale.height);
         const numSteps = 10; // 10 steps for 0.0 to 1.0
@@ -256,7 +256,7 @@ export class UiPopups extends Phaser.GameObjects.Container {
             this.scene.scale.height / 2
         ).setDepth(1);
     
-        const popupBg = this.scene.add.image(0, 0, 'messagePopup').setDepth(9);
+        const popupBg = this.scene.add.image(0, 0, 'messagePopup').setDepth(13);
         const settingText = this.scene.add.text(-100, -290, 'SETTINGS', {color: "#000000", fontSize: "100px", fontFamily: 'crashLandingItalic'});
         const soundsImage = this.scene.add.image(-270, -100, 'soundImage').setDepth(10).setScale(0.7);
         const musicImage = this.scene.add.image(-270, 100, 'musicImage').setDepth(10).setScale(0.7);
@@ -274,66 +274,63 @@ export class UiPopups extends Phaser.GameObjects.Container {
         .setDepth(11)
         .setInteractive({ draggable: true });
 
+        // Function to get the step index (0 to 9) based on pointer position
         const getStepIndex = (pointerX: number, progressBar: Phaser.GameObjects.Image): number => {
             const sectionWidth = progressBar.width / numSteps;
-            const relativeX = pointerX - progressBar.x; 
+            const relativeX = pointerX - progressBar.x;
             return Phaser.Math.Clamp(Math.round(relativeX / sectionWidth), 0, numSteps - 1);
         };
     
-        // soundLevelIndicator.x = soundProgreesBar.x + (soundProgreesBar.width * soundLevel) - soundProgreesBar.width / 2;
-        // musicLevelIndicator.x = musicProgreesBar.x + (musicProgreesBar.width * musicLevel) - musicProgreesBar.width / 2;
-
-        // Function to update sound level and indicator position
         const updateSoundLevel = (pointerX: number) => {
             const newSoundLevel = getStepIndex(pointerX, soundProgreesBar);
-    
-            // Only update if the level has actually changed
+
             if (newSoundLevel !== soundLevel) {
-                // Move one step at a time
-                soundLevel = Phaser.Math.Clamp(newSoundLevel, soundLevel - 1, soundLevel + 1);
-    
-                // Calculate and set the new indicator position
+                soundLevel = newSoundLevel;
                 const newX = soundProgreesBar.x + (soundLevel * soundProgreesBar.width / numSteps) - soundProgreesBar.width / 2;
-    
-                // Use a tween to animate the indicator's snapping
+
                 this.scene.tweens.add({
                     targets: soundLevelIndicator,
                     x: newX,
-                    duration: 100, // Adjust duration as needed
-                    ease: 'Cubic.easeOut', // Adjust easing as needed
+                    duration: 100,
+                    ease: 'Cubic.easeOut',
                     onComplete: () => {
-                        // Update actual sound volume (0.0 to 1.0) AFTER snapping
-                        const normalizedSoundLevel = soundLevel / (numSteps - 1); 
+                        const normalizedSoundLevel = soundLevel / (numSteps - 1);
                         console.log("Sound Level:", normalizedSoundLevel);
-                        // Example: this.scene.sound.setVolume(normalizedSoundLevel);
+                        this.adjustSoundVolume(normalizedSoundLevel); // Update sound volume
                     }
                 });
             }
         };
-    
-        const updateMusicLevel = (pointerX: number) => {
+       // Function to update music level (similar to updateSoundLevel)
+       const updateMusicLevel = (pointerX: number) => {
             const newMusicLevel = getStepIndex(pointerX, musicProgreesBar);
-    
+
             if (newMusicLevel !== musicLevel) {
                 musicLevel = newMusicLevel;
                 const newX = musicProgreesBar.x + (musicLevel * musicProgreesBar.width / numSteps) - musicProgreesBar.width / 2;
-                musicLevelIndicator.x = newX;
-                const normalizedMusicLevel = musicLevel / (numSteps - 1);
-                console.log("Music Level:", normalizedMusicLevel);
+
+                this.scene.tweens.add({
+                    targets: musicLevelIndicator,
+                    x: newX,
+                    duration: 100,
+                    ease: 'Cubic.easeOut',
+                    onComplete: () => {
+                        const normalizedMusicLevel = musicLevel / (numSteps - 1);
+                        console.log("Music Level:", normalizedMusicLevel);
+                        this.adjustMusicVolume(normalizedMusicLevel); // Update music volume
+                    }
+                });
             }
         };
-        
-         // Set initial indicator positions (start at 0.0)
+        // Set initial indicator positions (start at 0.0)
         soundLevelIndicator.x = soundProgreesBar.x - soundProgreesBar.width / 2;
         musicLevelIndicator.x = musicProgreesBar.x - musicProgreesBar.width / 2;
 
-        let isDraggingSound = false;
-        let isDraggingMusic = false;
-    
+        // === Drag Events ===
         soundLevelIndicator.on('drag', (pointer: Phaser.Input.Pointer) => {
             updateSoundLevel(pointer.x);
         });
-    
+
         musicLevelIndicator.on('drag', (pointer: Phaser.Input.Pointer) => {
             updateMusicLevel(pointer.x);
         });
@@ -357,26 +354,15 @@ export class UiPopups extends Phaser.GameObjects.Container {
         
         infopopupContainer.add([popupBg, settingText, this.settingClose, soundsImage, musicImage, soundProgreesBar, musicProgreesBar, volume0, volume100, musicVolume0, musicVolume100, soundLevelIndicator, musicLevelIndicator]);
     }
-    
 
-    // Function to adjust sound volume
-    adjustSoundVolume(level:number) {
-        let adjustMusicVolume
-        adjustMusicVolume = parseFloat(level.toFixed(1))
-        adjustMusicVolume = adjustMusicVolume < 0 ? 0: adjustMusicVolume 
-        if(adjustMusicVolume < 0 ){
-            this.SoundManager.setVolume("backgroundMusic", adjustMusicVolume)
-        }
+   // Function to adjust sound volume
+   adjustSoundVolume(level: number) {
+        this.SoundManager.setVolume("soundEffects", level); // Assuming "soundEffects" is your sound key
     }
 
     // Function to adjust music volume
     adjustMusicVolume(level: number) {
-        let adjustMusicVolume
-        adjustMusicVolume = parseFloat(level.toFixed(1))
-        adjustMusicVolume = adjustMusicVolume < 0 ? 0: adjustMusicVolume 
-        if(adjustMusicVolume < 0 ){
-            this.SoundManager.setVolume("backgroundMusic", adjustMusicVolume)
-        }
+        this.SoundManager.setVolume("backgroundMusic", level); // Assuming "backgroundMusic" is your music key
     }
     
     buttonMusic(key: string){

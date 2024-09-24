@@ -36,14 +36,10 @@ export default class InfoScene extends Scene{
             }
         });
         this.leftArrow.on('pointerdown', ()=>{
-            console.log("left arrow clicked");
-            // this.goToPreviousPage();
-            
+            this.goToPreviousPage();
         })
         this.rightArrow.on('pointerdown', ()=>{
-            console.log("rightArrow arrow clicked");
-            // this.goToNextPage()
-            
+            this.goToNextPage()
         })
         this.pageviewContainer.add([this.leftArrow, this.rightArrow, this.infoCross])
         this.pages = []
@@ -108,78 +104,50 @@ export default class InfoScene extends Scene{
         this.pages[1].add([symbol1, symbol2, symbol3, symbol4, symbol5, symbol6, symbol7, symbol8]);
         this.pageviewContainer.add(this.pages[1]);
 
-        this.pages[2] = this.add.container(this.scale.width, 0);  // Position off-screen initially
+        this.pages[2] = this.add.container(0, 0);  // Position off-screen initially
+
+        const BonusSceneHeading = this.add.text(this.scale.width/2.3, 300, "BONUS GAME", {fontFamily:"crashLandingItalic", color: "#ffffff", fontSize: "80px"})
+
+        const bonusGameImg = this.add.sprite(this.scale.width/2.9, 550, "BonusScenegame").setScale(0.25)
+
+        const BonusSceneDescription = this.add.text(this.scale.width/1.95, 430, "Triggers bonus game if 5 icons appear anywhere on the result matrix.", {fontFamily:"crashLandingItalic", align:"center", color: "#ffffff", fontSize: "60px", wordWrap:{ width: 600, useAdvancedWrap: true }})
         
-        this.pages[2].add(this.add.sprite(200, 300, 'Page2Sprite'));
+        this.pages[2].add([BonusSceneHeading, bonusGameImg, BonusSceneDescription])
         this.pageviewContainer.add(this.pages[2]);
 
-        this.pages[3] = this.add.container(this.scale.width * 2, 0);  // Position off-screen initially
-        this.pages[3].add(this.add.sprite(200, 300, 'Page3Sprite'));
+        this.pages[3] = this.add.container(0, 0);  // Position off-screen initially
+
+        const riskGameHeading = this.add.text(this.scale.width/2.3, 270, "Risk Game", {fontFamily:"crashLandingItalic", color: "#ffffff", fontSize: "80px"})
+
+        const riskGameImg = this.add.sprite(this.scale.width/2.9, 550, "riskGameimage").setScale(0.25)
+
+        const riskGameDescription = this.add.text(this.scale.width/1.95, 385, `The player can click the "Double" Button After a win to activate the risk game.  the player faces off against the dealer with the total four cards. the player selects one of three face-down cards first, then the dealer reveals their card, if the player chosen card is higher in value than the delear's card, the players winnings are doubled. If not then player receives nothing.`, {fontFamily:"crashLandingItalic", align:"center", color: "#ffffff", fontSize: "40px", wordWrap:{ width: 550, useAdvancedWrap: true }})
+        
+        this.pages[3].add([riskGameHeading, riskGameImg, riskGameDescription])
         this.pageviewContainer.add(this.pages[3]);
 
         this.pages = [this.pages[1], this.pages[2], this.pages[3]];
         this.currentPageIndex = 0;
+        
+        // Set initial visibility 
+        this.pages.forEach((page, index) => {
+            page.setVisible(index === this.currentPageIndex);
+        });
     }
 
     goToNextPage() {
         if (this.currentPageIndex < this.pages.length - 1) {
-            const currentPage = this.pages[this.currentPageIndex];
-            const nextPage = this.pages[this.currentPageIndex + 1];
-
-            // Animate current page out (move left)
-            this.tweens.add({
-                targets: currentPage,
-                x: -this.scale.width,  // Move off-screen to the left
-                duration: 500,
-                ease: 'Power2',
-                onComplete: () => {
-                    currentPage.setVisible(false);
-                }
-            });
-
-            // Animate next page in (move from right)
-            this.tweens.add({
-                targets: nextPage,
-                x: 0,  // Move into view
-                duration: 500,
-                ease: 'Power2',
-                onStart: () => {
-                    nextPage.setVisible(true);
-                }
-            });
-
+            this.pages[this.currentPageIndex].setVisible(false);
             this.currentPageIndex++;
+            this.pages[this.currentPageIndex].setVisible(true);
         }
     }
 
     goToPreviousPage() {
         if (this.currentPageIndex > 0) {
-            const currentPage = this.pages[this.currentPageIndex];
-            const prevPage = this.pages[this.currentPageIndex - 1];
-
-            // Animate current page out (move right)
-            this.tweens.add({
-                targets: currentPage,
-                x: this.scale.width,  // Move off-screen to the right
-                duration: 500,
-                ease: 'Power2',
-                onComplete: () => {
-                    currentPage.setVisible(false);
-                }
-            });
-
-            // Animate previous page in (move from left)
-            this.tweens.add({
-                targets: prevPage,
-                x: 0,  // Move into view
-                duration: 500,
-                ease: 'Power2',
-                onStart: () => {
-                    prevPage.setVisible(true);
-                }
-            });
-
+            this.pages[this.currentPageIndex].setVisible(false);
             this.currentPageIndex--;
+            this.pages[this.currentPageIndex].setVisible(true);
         }
     }
 }

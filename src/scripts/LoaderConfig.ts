@@ -60,6 +60,8 @@ export const LoaderConfig = {
     crossButtonHover: "src/sprites/crossButtonHover.png",
     infoCross: "src/sprites/infoCross.png",
     disconnectClose: "src/sprites/closeButton.png",
+    BonusScenegame: "src/sprites/BonusSceneImage.jpg",
+    riskGameimage: "src/sprites/RiskGameImage.jpg",
 
     coin0: "src/sprites/coin1.png",
     coin1: "src/sprites/coin2.png",

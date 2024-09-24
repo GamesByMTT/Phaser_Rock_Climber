@@ -132,9 +132,7 @@ export default class GambleScene extends Scene {
     }
 
     updateCurrentWinningText() {
-       
         let winAmount = gambleResult.gamleResultData.currentWining
-        console.log(winAmount, "new winnning");
         this.currentWinningText.setText(`${winAmount}`);
     }
 

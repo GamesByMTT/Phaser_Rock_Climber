@@ -34,11 +34,10 @@ export default class MainScene extends Scene {
         // Initialize main container
         this.mainContainer = this.add.container();
         this.soundManager = new SoundManager(this)
-        console.log("ManinScene Loaded on Crazy Monkey");
+        console.log("ManinScene Loaded on Rock Climbing Monkey");
         // Set up the stairs frame
         this.gameBg = new Phaser.GameObjects.Sprite(this, width/2, height/2, 'gameBg').setDepth(0).setDisplaySize(1920, 1080)
         // this.reelBg = new Phaser.GameObjects.Sprite(this, width/2, height/2.2, 'reelBg').setDepth(0)
-       
         
         this.mainContainer.add([this.gameBg])
         this.soundManager.playSound("backgroundMusic")

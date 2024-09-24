@@ -7,7 +7,7 @@ const webpack = require("webpack");
 // const Dotenv = require('dotenv-webpack');
 
 const line = "---------------------------------------------------------";
-const msg = `Crazy Monkey Slot Game`;
+const msg = `Rock Climbing Monkey Slot Game`;
 process.stdout.write(`${line}\n${msg}\n${line}\n`);
 module.exports = {
     mode: "production",
@@ -96,6 +96,7 @@ module.exports = {
             patterns: [
                 { from: 'public/src/sprites', to: 'src/sprites' },
                 { from: 'public/src/sounds', to: 'src/sounds' },
+                { from: 'public/src/sounds', to: 'src/fonts' },
                 { from: 'public/favicon.png', to: 'favicon.png' },
                 { from: 'public/style.css', to: 'style.css' }
             ],

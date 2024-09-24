@@ -1,2 +1,2 @@
-# crazy-monkey-phaserjs
-crazy monkey slot game in phaser
+# rock-Climbing-phaser
+Rock Climbing slot game in phaser
