@@ -196,8 +196,8 @@ export class Slots extends Phaser.GameObjects.Container {
             targets: reel,
             y: targetY, // Animate relative to the current position
             duration: 500,
-            ease: 'Elastic.easeOut',
-            // ease: 'Cubic.easeOut',
+            // ease: 'Elastic.easeOut',
+            ease: 'Cubic.easeOut',
             onComplete: () => {
                 if (this.reelTweens[reelIndex]) {
                     this.reelTweens[reelIndex].stop(); 

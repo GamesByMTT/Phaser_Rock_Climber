@@ -318,11 +318,8 @@ export class UiPopups extends Phaser.GameObjects.Container {
                 musicLevel = newMusicLevel;
                 const newX = musicProgreesBar.x + (musicLevel * musicProgreesBar.width / numSteps) - musicProgreesBar.width / 2;
                 musicLevelIndicator.x = newX;
-    
-                // Update actual music volume (0.0 to 1.0)
                 const normalizedMusicLevel = musicLevel / (numSteps - 1);
                 console.log("Music Level:", normalizedMusicLevel);
-                // Example: this.scene.sound.setMusicVolume(normalizedMusicLevel);
             }
         };
         
