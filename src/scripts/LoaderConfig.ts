@@ -83,7 +83,6 @@ export const LoaderConfig = {
     coin17: "src/sprites/coin18.png",
     coin18: "src/sprites/coin19.png",
 
-    assetsloader: "src/sprites/assetsloader.png",
     loaderBg: "src/sprites/loaderBg.png",
     reelBg: "src/sprites/reelBg.png",   
     column: "src/sprites/columnLeft.png",
@@ -117,7 +116,6 @@ export const LoaderConfig = {
     left6: "src/sprites/7.png",
     left7: "src/sprites/8.png",
     left8: "src/sprites/9.png",
-
 
     leftHover0: "src/sprites/LineNumber1.png",
     leftHover1: "src/sprites/LineNumber2.png",
