@@ -79,9 +79,9 @@ module.exports = {
     "typeof CANVAS_RENDERER": JSON.stringify(true),
     "typeof WEBGL_RENDERER": JSON.stringify(true),
     "typeof WEBGL_DEBUG": JSON.stringify(true),
-    "typeof EXPERIMENTAL": JSON.stringify(true),
-    "typeof PLUGIN_3D": JSON.stringify(false),
-    "typeof PLUGIN_CAMERA3D": JSON.stringify(false),
+    // "typeof EXPERIMENTAL": JSON.stringify(true),
+    // "typeof PLUGIN_3D": JSON.stringify(false),
+    // "typeof PLUGIN_CAMERA3D": JSON.stringify(false),
     "typeof PLUGIN_FBINSTANT": JSON.stringify(false),
     "typeof FEATURE_SOUND": JSON.stringify(true)
 }),
@@ -100,14 +100,5 @@ new CopyPlugin({
 new webpack.DefinePlugin({
   IS_DEV: JSON.stringify(true),
 }),
-
-    // new CopyPlugin({
-    //   patterns: [
-    //     {
-    //       from: 'static',
-    //       //context: path.join(__dirname, 'your-app'),
-    //     }
-    //   ]
-    // })
   ]
 };

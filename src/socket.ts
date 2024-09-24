@@ -1,11 +1,6 @@
 import { io } from "socket.io-client";
 import { Globals, ResultData, initData, gambleData, gambleResult } from "./scripts/Globals";
-import MainLoader from "./view/MainLoader";
 import Disconnection from "./scripts/Disconecction";
-
-let counter = 0
-
-
 // const socketUrl = process.env.SOCKET_URL || ""
 export class SocketManager {
   public socket : any;
@@ -45,16 +40,12 @@ export class SocketManager {
 
   private setupEventListeners() {
     this.socket.on("connect_error", (error: Error) => {
-      console.error("Connection Error:", error.message);
     });
 
     this.socket.on("connect", () => {
       console.log("Connected to the server");
       this.socket.on("message", (message : any) => {
         const data = JSON.parse(message);
-        // console.log(`Message ID : ${data.id} |||||| Message Data : ${JSON.stringify(data.message)}`);
-        console.log("Message ID", data);
-        
         if(data.id == "InitData" ) {
           if(initData.gameData.Bets.length != 0){
             if(Globals.SceneHandler?.getScene("Disconnection")){
@@ -67,11 +58,7 @@ export class SocketManager {
             initData.playerData = data.message.PlayerData;
             initData.UIData.symbols = data.message.UIData.paylines.symbols
             initData.gameData.BonusData = data.message.BonusData;
-            console.log(data, "initData on Socket File");
           }
-            // Globals.MainLoader?.onInitDataReceived();
-            // this.onInitDataReceived()
-            
         }
         if(data.id == "ResultData"){
               ResultData.gameData = data.message.GameData;

@@ -7,7 +7,7 @@ const webpack = require("webpack");
 // const Dotenv = require('dotenv-webpack');
 
 const line = "---------------------------------------------------------";
-const msg = `Rock Climbing Monkey Slot Game`;
+const msg = `Rock Climbing Slot Game`;
 process.stdout.write(`${line}\n${msg}\n${line}\n`);
 module.exports = {
     mode: "production",
@@ -83,9 +83,9 @@ module.exports = {
             "typeof CANVAS_RENDERER": JSON.stringify(true),
             "typeof WEBGL_RENDERER": JSON.stringify(true),
             "typeof WEBGL_DEBUG": JSON.stringify(false),
-            "typeof EXPERIMENTAL": JSON.stringify(false),
-            "typeof PLUGIN_3D": JSON.stringify(false),
-            "typeof PLUGIN_CAMERA3D": JSON.stringify(false),
+            // "typeof EXPERIMENTAL": JSON.stringify(false),
+            // "typeof PLUGIN_3D": JSON.stringify(false),
+            // "typeof PLUGIN_CAMERA3D": JSON.stringify(false),
             "typeof PLUGIN_FBINSTANT": JSON.stringify(false),
             "typeof FEATURE_SOUND": JSON.stringify(true)
         }),

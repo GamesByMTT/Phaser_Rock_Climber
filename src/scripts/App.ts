@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { CalculateScaleFactor, gameConfig } from './appconfig';
+import { CalculateScaleFactor } from './appconfig';
 import { UiContainer } from './UiContainer';
 import MainLoader from '../view/MainLoader';
 
