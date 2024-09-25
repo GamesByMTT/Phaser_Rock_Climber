@@ -10,10 +10,11 @@ type globalDataType = {
   emitter: MyEmitter | undefined;
   isMobile: boolean;
   fpsStats: Stats;
-  soundResources: { [key: string]: Howl };
+  soundResources: { [key: string]: Howl & { userVolume?: number }};
   SceneHandler: SceneHandler | undefined;
   Socket: SocketManager | undefined;
   PhaserInstance: Phaser.Game | undefined;
+  masterVolume: number; // Add this line
 };
 
 export const Globals: globalDataType = {
@@ -31,6 +32,7 @@ export const Globals: globalDataType = {
   Socket: undefined,
   soundResources: {},
   PhaserInstance: undefined,
+  masterVolume: 1,
 };
 
 // Define the structure of a symbol object

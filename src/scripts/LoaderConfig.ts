@@ -1,8 +1,4 @@
-import { disconnect } from "process";
-
-// import { Background } from './Background';
 export const LoaderConfig = {
-    // frame : "/src/sprites/SlotMachine_3x5.png",
     Background: "src/sprites/Background.jpg",
     gameBg: "src/sprites/Background.jpg",
     spinBtn : "/src/sprites/ButtonSpin_1.png",
@@ -11,11 +7,8 @@ export const LoaderConfig = {
     maxBetBtOnPressed :  "/src/sprites/ButtonMaxBetHover_1.png",
     autoSpin :  "/src/sprites/ButtonAutoSpin_1.png",
     autoSpinOnPressed : "/src/sprites/ButtonAutoSpinHover_1.png",
-    // BetPanel :  "/src/sprites/PanelTotalBet.png",
     pBtn  :  "/src/sprites/ButtonPlus.png",
-    // mBtn  :  "/src/sprites/ButtonMinus.png",
     pBtnH  :  "/src/sprites/ButtonPlusHover.png",
-    // mBtnH  :  "/src/sprites/ButtonMinusHover.png",
     lines :  "/src/sprites/PanelLines.png",
     GambleBg: "src/sprites/GambleBg.png",
     winPanel :  "/src/sprites/PanelWin.png",
@@ -25,7 +18,6 @@ export const LoaderConfig = {
     balancePanel :  "/src/sprites/PanelBalance.png",
     doubleButton: "src/sprites/doubleButton.png",
     doubleButtonPressed : "src/sprites/doubleButtonPressed.png",
-    // winBg: "src/sprites/winBg.png",
     MenuBtn :  "/src/sprites/ButtonMenu.png",
     MenuBtnH :  "/src/sprites/ButtonMenuHover.png",
     settingBtn :  "/src/sprites/ButtonSettings.png",
@@ -47,7 +39,6 @@ export const LoaderConfig = {
     exitButtonPressed: "src/sprites/ExitButton.png",
     PopupBackground: "src/sprites/popupBackground.png",
     messagePopup: "src/sprites/messagePopup.png",
-    // normalButton: "src/sprites/NormalButton.png",
     hugeWinPopup:"src/sprites/HugeWinPopup.png",
     megaWinPopup: "src/sprites/MegaWinPopup.png",
     leftArrow: "src/sprites/leftArrow.png",
@@ -520,7 +511,3 @@ export const LoaderSoundConfig: any = {
         bonuswin: "src/sounds/bonuswin.mp3",
  
 };
-
-export const preloaderConfig = {
-    // startLogo:  "/src/sprites/Logo.png")
-}

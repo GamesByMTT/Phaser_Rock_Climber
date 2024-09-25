@@ -8,6 +8,7 @@ export default class SoundManager {
     public sounds: { [key: string]: Phaser.Sound.BaseSound } = {};
     private soundEnabled: boolean = true;
     private musicEnabled: boolean = true;
+    private masterVolume: number = 1; // New property for master volume
 
     constructor(scene: Phaser.Scene) {
         this.scene = scene;
@@ -20,8 +21,6 @@ export default class SoundManager {
         } else {
             this.sounds[key] = this.scene.sound.add(key, { volume: 0.5 });
         }
-        // console.log(this.sounds[key], "test");
-        
     }
 
     public playSound(key: string) {
@@ -67,25 +66,28 @@ public setMusicEnabled(enabled: boolean) {
         this.playSound("backgroundMusic")
     }
 }
+public setMasterVolume(volume: number) {
+    Globals.masterVolume = Phaser.Math.Clamp(volume, 0, 1);
+    Object.entries(Globals.soundResources).forEach(([key, sound]) => {
+        if (key !== 'backgroundMusic') {
+            this.applyVolumeToSound(sound);
+        }
+    });
+}
 
- // Function to adjust volume level of a playing sound using Globals.soundResources
- public setVolume(key: string, volume: number) {
+public setVolume(key: string, volume: number) {
     const sound = Globals.soundResources[key];
     if (sound) {
-        // Ensure volume is between 0 and 1
-        const clampedVolume = Phaser.Math.Clamp(volume, 0, 1);
-        if (sound instanceof Phaser.Sound.WebAudioSound || sound instanceof Phaser.Sound.HTML5AudioSound) {
-            // console.log("bfgbbfgbb");
-            
-            sound.setVolume(clampedVolume);  // Correctly set the volume using setVolume method
-        } else {
-            // console.warn(`Sound ${key} does not support setVolume.`);
-        }
-        // console.log(`Volume for ${key} set to ${clampedVolume}`);
-    } else {
-        // console.warn(`Sound ${key} not found in Globals.soundResources.`);
+        sound.userVolume = Phaser.Math.Clamp(volume, 0, 1);
+        this.applyVolumeToSound(sound);
     }
 }
+
+private applyVolumeToSound(sound: Howl & { userVolume?: number }) {
+    const finalVolume = Globals.masterVolume * (sound.userVolume || 1);
+    sound.volume(finalVolume);
+}
+
 
 public getSound(key: string): Phaser.Sound.BaseSound | undefined {
     return this.sounds[key];
@@ -99,5 +101,14 @@ private setupFocusBlurEvents() {
         window.addEventListener('focus', () => {
             this.resumeBgMusic('backgroundMusic');
         });
+    }
+
+    public getMasterVolume(): number {
+        return this.masterVolume;
+    }
+
+    public getSoundVolume(key: string): number {
+        const sound = Globals.soundResources[key];
+        return sound ? (sound.userVolume || 1) : 1;
     }
 }

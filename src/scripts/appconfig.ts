@@ -6,7 +6,7 @@ const BASE_HEIGHT = 1080;
 const ASPECT_RATIO = BASE_WIDTH / BASE_HEIGHT;
 
 export const gameConfig = {   
-  type: Phaser.AUTO,
+  type: Phaser.CANVAS,
   scene: [MainLoader],
   antialias: true,
   scale: {
@@ -41,12 +41,12 @@ export const gameConfig = {
       return window.innerWidth - this.leftX;
     }
   },
-  physics: { 
-    default: "arcade",
-    arcade: {
-      debug: false,
-    },
-  },
+  // physics: { 
+  //   default: "arcade",
+  //   arcade: {
+  //     debug: false,
+  //   },
+  // },
 
   plugins: {
     global: [

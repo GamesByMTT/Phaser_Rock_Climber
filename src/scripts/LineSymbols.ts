@@ -1,5 +1,4 @@
 import Phaser from "phaser";
-import { initData } from "./Globals";
 import { gameConfig } from "./appconfig";
 import { LineGenerator } from "./Lines";
 

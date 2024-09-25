@@ -1,5 +1,4 @@
 import Phaser from "phaser";
-import { initData } from "./Globals";
 import { gameConfig } from "./appconfig";
 
 let xOffset = -1;
@@ -20,7 +19,6 @@ export class LineGenerator extends Phaser.GameObjects.Container {
             this.add(line);  // Add each 'Lines' container to this container
             this.lineArr.push(line);  // Store reference for later use
         }
-
         this.setPosition(gameConfig.scale.width / 3.8, gameConfig.scale.height / 2.9);
 
         // Add this Container to the scene

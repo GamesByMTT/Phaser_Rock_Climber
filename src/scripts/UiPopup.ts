@@ -1,13 +1,10 @@
 import Phaser from "phaser";
 import { Globals, initData, TextStyle } from "./Globals";
 import { gameConfig } from "./appconfig";
-import { TextLabel } from "./TextLabel";
 import { UiContainer } from "./UiContainer";
 import SoundManager from "./SoundManager";
 import InfoScene from "./infoPopup";
-import { text } from "stream/consumers";
 
-const Random = Phaser.Math.Between;
 export class UiPopups extends Phaser.GameObjects.Container {
     SoundManager: SoundManager;
     UiContainer: UiContainer
@@ -19,17 +16,10 @@ export class UiPopups extends Phaser.GameObjects.Container {
     yesBtn!: InteractiveBtn;
     noBtn!: InteractiveBtn
     isOpen: boolean = false;
-    isExitOpen: boolean = false;
     settingClose!: InteractiveBtn;
-    onButton!: InteractiveBtn;
-    offButton!:InteractiveBtn;
-    toggleBar!: InteractiveBtn;
     soundEnabled: boolean = true; // Track sound state
     musicEnabled: boolean = true; // Track sound state
-    popupBackground!: Phaser.GameObjects.Sprite;  // Background sprite for popup
-    pageViewContainer!: Phaser.GameObjects.Container;
-    currentPageIndex: number = 0;
-    pages: Phaser.GameObjects.Container[] = [];
+
     constructor(scene: Phaser.Scene, uiContainer: UiContainer, soundManager: SoundManager) {
         super(scene);
         this.setPosition(0, 0);
@@ -38,20 +28,8 @@ export class UiPopups extends Phaser.GameObjects.Container {
         this.menuBtnInit();
         this.exitButton();
         this.infoBtnInit();
-         // Initialize background sprite for popup with initial opacity of 0 (hidden)
-         this.popupBackground = this.scene.add.sprite(gameConfig.scale.width / 2, gameConfig.scale.height / 2, 'PopupBackground')
-         .setOrigin(0.5)
-         .setAlpha(0)
-         .setDepth(9); // Set initial transparency to 0 (hidden)
-         this.popupBackground.setDisplaySize(this.popupBackground.width * 0.25, this.popupBackground.height * 0.25); // Make it fullscreen
-
-         // Initialize Page View container
-        this.pageViewContainer = this.scene.add.container(0, 0);
-        this.pageViewContainer.setVisible(false); // Initially hidden
-        this.add(this.pageViewContainer);
         this.UiContainer = uiContainer
         this.SoundManager = soundManager
-        this.initPageView();
         scene.add.existing(this);
     }
 
@@ -109,24 +87,6 @@ export class UiPopups extends Phaser.GameObjects.Container {
         this.add(this.infoBtn);
     }
 
-   
-    initPageView() {
-        const conatiner = this.scene.add.container(gameConfig.scale.width, gameConfig.scale.height).setInteractive()
-        conatiner.on('pointerdown', (pointerdown: Phaser.Input.Pointer)=>{
-            pointerdown.event.stopPropagation();
-        })
-        // Create pages with the ability to add custom content
-        for (let i = 0; i < 3; i++) {
-            const page = this.scene.add.container(i * gameConfig.scale.width, 100); // Position pages side by side off-screen initially
-            this.pages.push(page);
-            this.pageViewContainer.add(page);
-        }
-        const BonusHeading = this.scene.add.text(gameConfig.scale.width/2, gameConfig.scale.height - 100, "Bonus Game", {color: "#ffffff", align: "center"})
-        this.addCustomContentToPage(0, [BonusHeading]);
-        // Add navigation buttons
-        this.addNavigationButtons();
-    }
-
     openPopUp() {
         // Toggle the isOpen boolean
         this.isOpen = !this.isOpen;
@@ -175,165 +135,124 @@ export class UiPopups extends Phaser.GameObjects.Container {
     openPage() {
         Globals.SceneHandler?.addScene("InfoScene", InfoScene, true)
     }
-    closePopUp() {
-        // Reset visibility and background opacity when closing popup
-        this.pageViewContainer.setVisible(false);
-        this.popupBackground.setAlpha(0); // Hide background
-    }
-    addNavigationButtons() {
-        // Previous Page Button
-        const prevButton = this.scene.add.sprite(250, 550, 'leftArrow')
-        .setScale(0.2)
-        .setDepth(12)
-        .setInteractive()
-        .on('pointerdown', () => this.changePage(-1));
-        this.pageViewContainer.add(prevButton);
-
-        // Next Page Button
-        const nextButton = this.scene.add.sprite(gameConfig.scale.width * 0.9, 550, 'rightArrow')
-        .setScale(0.2)
-        .setDepth(11)
-        .setInteractive()
-        .on('pointerdown', () => this.changePage(1));
-        this.pageViewContainer.add(nextButton);
-    }
-
-    changePage(direction: number) {
-        const nextPageIndex = this.currentPageIndex + direction;
-
-        if (nextPageIndex < 0 || nextPageIndex >= this.pages.length) {
-            return; // Prevent out of bounds
-        }
-
-        // Slide current page out of view and next page into view
-        const currentPage = this.pages[this.currentPageIndex];
-        const nextPage = this.pages[nextPageIndex];
-
-        this.scene.tweens.add({
-            targets: currentPage,
-            x: `-=${gameConfig.scale.width}`,
-            duration: 500,
-            ease: 'Power2'
-        });
-
-        this.scene.tweens.add({
-            targets: nextPage,
-            x: `-=${gameConfig.scale.width}`,
-            duration: 500,
-            ease: 'Power2',
-            onComplete: () => {
-                this.currentPageIndex = nextPageIndex;
-                this.updatePageView();
-            }
-        });
-    }
-
-    addCustomContentToPage(pageIndex: number, content: Phaser.GameObjects.GameObject[]) {
-        // Clear existing content on the page
-        this.pages[pageIndex].removeAll(true);
-
-        // Add new custom content to the specified page
-        content.forEach(item => this.pages[pageIndex].add(item));
-    }
-
-
-    updatePageView(){
-
-    }
+   
     /**
      * 
      */
     openSettingPopup() {
-        const settingblurGraphic = this.scene.add.graphics();
-        settingblurGraphic.fillStyle(0x000000, 0.5);
-        settingblurGraphic.fillRect(0, 0, this.scene.scale.width, this.scene.scale.height);
+        const inputOverlay = this.scene.add.rectangle(0, 0, this.scene.cameras.main.width, this.scene.cameras.main.height, 0x000000, 0.7)
+            .setOrigin(0, 0)
+            .setDepth(16)
+            .setInteractive();
+    
+        inputOverlay.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+            pointer.event.stopPropagation();
+        });
+    
+        // const settingblurGraphic = this.scene.add.graphics();
+        // settingblurGraphic.fillStyle(0x000000, 0.5);
+        // settingblurGraphic.fillRect(0, 0, this.scene.scale.width, this.scene.scale.height);
+    
         const numSteps = 10; // 10 steps for 0.0 to 1.0
-        let soundLevel = 5; // Initial sound level (0 to 9)
-        let musicLevel = 5; // Initial music level (0 to 9)
+        let soundLevel = Math.round(this.SoundManager.getMasterVolume() * (numSteps - 1));
+        let musicLevel = Math.round(this.SoundManager.getSoundVolume("backgroundMusic") * (numSteps - 1));
+    
         const infopopupContainer = this.scene.add.container(
             this.scene.scale.width / 2,
             this.scene.scale.height / 2
-        ).setDepth(1);
-    
+        ).setDepth(17); // Set depth higher than inputOverlay
+
+         // Create scrollbar container
         const popupBg = this.scene.add.image(0, 0, 'messagePopup').setDepth(13);
         const settingText = this.scene.add.text(-100, -290, 'SETTINGS', {color: "#000000", fontSize: "100px", fontFamily: 'crashLandingItalic'});
         const soundsImage = this.scene.add.image(-270, -100, 'soundImage').setDepth(10).setScale(0.7);
         const musicImage = this.scene.add.image(-270, 100, 'musicImage').setDepth(10).setScale(0.7);
-        const soundProgreesBar = this.scene.add.image(40, -100, 'sounProgress');
-        const musicProgreesBar = this.scene.add.image(40, 100, 'sounProgress');
         const volume0 = this.scene.add.text(-250, -190, "0%", {color: "#616d77", fontSize: "40px", fontFamily: 'crashLandingItalic'});
         const volume100 = this.scene.add.text(270, -190, "100%", {color: "#616d77", fontSize: "40px", fontFamily: 'crashLandingItalic'});
         const musicVolume0 = this.scene.add.text(-250, 10, "0%", {color: "#616d77", fontSize: "40px", fontFamily: 'crashLandingItalic'});
         const musicVolume100 = this.scene.add.text(270, 10, "100%", {color: "#616d77", fontSize: "40px", fontFamily: 'crashLandingItalic'});
-    
-        const soundLevelIndicator = this.scene.add.image(40, -100, 'indicatorSprite')
-        .setDepth(11)
-        .setInteractive({ draggable: true });
-        const musicLevelIndicator = this.scene.add.image(40, 100, 'indicatorSprite')
-        .setDepth(11)
-        .setInteractive({ draggable: true });
+       
+        const soundScrollbarContainer = this.scene.add.container(-200, -100);
+        const musicScrollbarContainer = this.scene.add.container(-200, 100);
 
-        // Function to get the step index (0 to 9) based on pointer position
-        const getStepIndex = (pointerX: number, progressBar: Phaser.GameObjects.Image): number => {
-            const sectionWidth = progressBar.width / numSteps;
-            const relativeX = pointerX - progressBar.x;
-            return Phaser.Math.Clamp(Math.round(relativeX / sectionWidth), 0, numSteps - 1);
-        };
-    
-        const updateSoundLevel = (pointerX: number) => {
-            const newSoundLevel = getStepIndex(pointerX, soundProgreesBar);
+            // Create scrollbar backgrounds
+            const soundScrollBar = this.scene.add.image(0, 0, 'sounProgress').setOrigin(0, 0.5);
+            const musicScrollBar = this.scene.add.image(0, 0, 'sounProgress').setOrigin(0, 0.5);
 
-            if (newSoundLevel !== soundLevel) {
-                soundLevel = newSoundLevel;
-                const newX = soundProgreesBar.x + (soundLevel * soundProgreesBar.width / numSteps) - soundProgreesBar.width / 2;
+            // Create handles
+            const soundHandle = this.scene.add.image(0, 0, 'indicatorSprite').setOrigin(0.5, 0.5);
+            const musicHandle = this.scene.add.image(0, 0, 'indicatorSprite').setOrigin(0.5, 0.5);
 
-                this.scene.tweens.add({
-                    targets: soundLevelIndicator,
-                    x: newX,
-                    duration: 100,
-                    ease: 'Cubic.easeOut',
-                    onComplete: () => {
-                        const normalizedSoundLevel = soundLevel / (numSteps - 1);
-                        console.log("Sound Level:", normalizedSoundLevel);
-                        this.adjustSoundVolume(normalizedSoundLevel); // Update sound volume
-                    }
-                });
-            }
-        };
-       // Function to update music level (similar to updateSoundLevel)
-       const updateMusicLevel = (pointerX: number) => {
-            const newMusicLevel = getStepIndex(pointerX, musicProgreesBar);
+            // Add backgrounds and handles to containers
+            soundScrollbarContainer.add([soundScrollBar, soundHandle]);
+            musicScrollbarContainer.add([musicScrollBar, musicHandle]);
 
-            if (newMusicLevel !== musicLevel) {
-                musicLevel = newMusicLevel;
-                const newX = musicProgreesBar.x + (musicLevel * musicProgreesBar.width / numSteps) - musicProgreesBar.width / 2;
+            const updateScrollbar = (handle: Phaser.GameObjects.Image, scrollBar: Phaser.GameObjects.Image, level: number) => {
+                const minX = 0;
+                const maxX = scrollBar.width;
+                handle.x = minX + (level / (numSteps - 1)) * maxX;
+            };
 
-                this.scene.tweens.add({
-                    targets: musicLevelIndicator,
-                    x: newX,
-                    duration: 100,
-                    ease: 'Cubic.easeOut',
-                    onComplete: () => {
-                        const normalizedMusicLevel = musicLevel / (numSteps - 1);
-                        console.log("Music Level:", normalizedMusicLevel);
-                        this.adjustMusicVolume(normalizedMusicLevel); // Update music volume
-                    }
-                });
-            }
-        };
-        // Set initial indicator positions (start at 0.0)
-        soundLevelIndicator.x = soundProgreesBar.x - soundProgreesBar.width / 2;
-        musicLevelIndicator.x = musicProgreesBar.x - musicProgreesBar.width / 2;
+            const updateLevel = (localX: number, handle: Phaser.GameObjects.Image, scrollBar: Phaser.GameObjects.Image, isSound: boolean) => {
+                const minX = 0;
+                const maxX = scrollBar.width;
+                
+                // Clamp the handle's x position to the scrollbar bounds
+                let newX = Phaser.Math.Clamp(localX, minX, maxX);
+                
+                // Update handle position
+                handle.x = newX;
+                
+                // Calculate the new level based on the handle's position
+                let newLevel = (newX / maxX) * (numSteps - 1);
+                newLevel = Phaser.Math.Clamp(newLevel, 0, numSteps - 1);
 
-        // === Drag Events ===
-        soundLevelIndicator.on('drag', (pointer: Phaser.Input.Pointer) => {
-            updateSoundLevel(pointer.x);
-        });
+                const normalizedLevel = newLevel / (numSteps - 1);
 
-        musicLevelIndicator.on('drag', (pointer: Phaser.Input.Pointer) => {
-            updateMusicLevel(pointer.x);
-        });
-    
+                if (isSound) {
+                    soundLevel = newLevel;
+                    this.adjustSoundVolume(normalizedLevel);
+                } else {
+                    musicLevel = newLevel;
+                    this.adjustMusicVolume(normalizedLevel);
+                }
+            };
+
+            // Set initial handle positions
+            updateScrollbar(soundHandle, soundScrollBar, soundLevel);
+            updateScrollbar(musicHandle, musicScrollBar, musicLevel);
+
+            // Make handles interactive
+            soundHandle.setInteractive({ draggable: true });
+            musicHandle.setInteractive({ draggable: true });
+
+            // Drag events
+            soundHandle.on('drag', (pointer: Phaser.Input.Pointer, dragX: number) => {
+                const localX = dragX;
+                updateLevel(localX, soundHandle, soundScrollBar, true);
+            });
+
+            musicHandle.on('drag', (pointer: Phaser.Input.Pointer, dragX: number) => {
+                const localX = dragX;
+                updateLevel(localX, musicHandle, musicScrollBar, false);
+            });
+
+            // Click events on scrollbars for direct level setting
+            soundScrollBar.setInteractive();
+            soundScrollBar.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+                const localX = pointer.x - soundScrollbarContainer.x;
+                updateLevel(localX, soundHandle, soundScrollBar, true);
+            });
+
+            musicScrollBar.setInteractive();
+            musicScrollBar.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+                const localX = pointer.x - musicScrollbarContainer.x;
+                updateLevel(localX, musicHandle, musicScrollBar, false);
+            });
+
+            soundScrollbarContainer.setPosition(-200, -100);
+            musicScrollbarContainer.setPosition(-200, 100);
+
         const exitButtonSprites = [
             this.scene.textures.get('infoCross'),
             this.scene.textures.get('infoCross')
@@ -341,7 +260,8 @@ export class UiPopups extends Phaser.GameObjects.Container {
         
         this.settingClose = new InteractiveBtn(this.scene, exitButtonSprites, () => {
             infopopupContainer.destroy();
-            settingblurGraphic.destroy();
+            inputOverlay.destroy();
+            inputOverlay.destroy();
             this.buttonMusic("buttonpressed");
         }, 0, true);
         
@@ -351,17 +271,18 @@ export class UiPopups extends Phaser.GameObjects.Container {
         popupBg.setScale(0.9);
         popupBg.setAlpha(1);
         
-        infopopupContainer.add([popupBg, settingText, this.settingClose, soundsImage, musicImage, soundProgreesBar, musicProgreesBar, volume0, volume100, musicVolume0, musicVolume100, soundLevelIndicator, musicLevelIndicator]);
+        infopopupContainer.add([popupBg, settingText, this.settingClose, soundsImage, musicImage,  volume0, volume100, musicVolume0, musicVolume100,  soundScrollbarContainer,
+            musicScrollbarContainer]);
     }
 
    // Function to adjust sound volume
-   adjustSoundVolume(level: number) {
-        this.SoundManager.setVolume("soundEffects", level); // Assuming "soundEffects" is your sound key
+    adjustSoundVolume(level: number) {
+        this.SoundManager.setMasterVolume(level);
     }
 
     // Function to adjust music volume
     adjustMusicVolume(level: number) {
-        this.SoundManager.setVolume("backgroundMusic", level); // Assuming "backgroundMusic" is your music key
+        this.SoundManager.setVolume("backgroundMusic", level);
     }
     
     buttonMusic(key: string){

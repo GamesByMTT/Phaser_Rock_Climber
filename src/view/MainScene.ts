@@ -1,229 +1,219 @@
-import { Scene, GameObjects, Scale } from 'phaser';
+import { Scene } from 'phaser';
 import { Slots } from '../scripts/Slots';
 import { UiContainer } from '../scripts/UiContainer';
-import { LineGenerator, Lines } from '../scripts/Lines';
+import { LineGenerator } from '../scripts/Lines';
 import { UiPopups } from '../scripts/UiPopup';
 import LineSymbols from '../scripts/LineSymbols';
-import { Globals, ResultData, currentGameData, initData, gambleResult } from '../scripts/Globals';
+import { 
+    Globals, 
+    ResultData, 
+    currentGameData, 
+    initData, 
+    gambleResult 
+} from '../scripts/Globals';
 import { gameConfig } from '../scripts/appconfig';
 import BonusScene from './BonusScene';
 import SoundManager from '../scripts/SoundManager';
 
 export default class MainScene extends Scene {
-    gameBg!: Phaser.GameObjects.Sprite
+    // Declare properties without explicit initialization
+    gameBg!: Phaser.GameObjects.Sprite;
     slot!: Slots;
-    slotFrame!: Phaser.GameObjects.Sprite
     lineGenerator!: LineGenerator;
-    soundManager!: SoundManager
+    soundManager!: SoundManager;
     uiContainer!: UiContainer;
-    uiPopups!: UiPopups;
-    lineSymbols!: LineSymbols
-    onSpinSound!: Phaser.Sound.BaseSound
+    uiPopups!: UiPopups;    
+    lineSymbols!: LineSymbols;
     private mainContainer!: Phaser.GameObjects.Container;
 
     constructor() {
         super({ key: 'MainScene' });
     }
-    /**
-     * @method create method used to create scene and add graphics respective to the x and y coordinates
-     */
-    create() {
-        // Set up the background
-        const { width, height } = this.cameras.main;
-        // Initialize main container
-        this.mainContainer = this.add.container();
-        this.soundManager = new SoundManager(this)
-        console.log("ManinScene Loaded on Rock Climbing Monkey");
-        // Set up the stairs frame
-        this.gameBg = new Phaser.GameObjects.Sprite(this, width/2, height/2, 'gameBg').setDepth(0).setDisplaySize(1920, 1080)
-        // this.reelBg = new Phaser.GameObjects.Sprite(this, width/2, height/2.2, 'reelBg').setDepth(0)
-        
-        this.mainContainer.add([this.gameBg])
-        this.soundManager.playSound("backgroundMusic")
 
-        // Initialize UI Container
+    create() {
+        const { width, height } = this.cameras.main;
+
+        // Container for better organization and potential performance
+        this.mainContainer = this.add.container();
+
+        this.soundManager = new SoundManager(this);
+        console.log("MainScene Loaded on Rock Climbing Monkey");
+
+        this.gameBg = this.add.sprite(width / 2, height / 2, 'gameBg')
+            .setDepth(0)
+            .setDisplaySize(1920, 1080);
+
+        this.mainContainer.add(this.gameBg);
+        this.soundManager.playSound("backgroundMusic");
+
         this.uiContainer = new UiContainer(this, () => this.onSpinCallBack(), this.soundManager);
         this.mainContainer.add(this.uiContainer);
-        // // Initialize Slots
-        this.slot = new Slots(this, this.uiContainer,() => this.onResultCallBack(), this.soundManager);
-        // Initialize payLines
+
+        this.slot = new Slots(this, this.uiContainer, () => this.onResultCallBack(), this.soundManager);
         this.lineGenerator = new LineGenerator(this, this.slot.slotSymbols[0][0].symbol.height + 50, this.slot.slotSymbols[0][0].symbol.width + 10);
         this.mainContainer.add([this.lineGenerator, this.slot]);
 
-        // Initialize UI Popups
         this.uiPopups = new UiPopups(this, this.uiContainer, this.soundManager);
-        this.mainContainer.add(this.uiPopups)
+        this.mainContainer.add(this.uiPopups);
 
-        // Initialize LineSymbols
-        this.lineSymbols = new LineSymbols(this, 10, 12, this.lineGenerator)
-        
+        this.lineSymbols = new LineSymbols(this, 10, 12, this.lineGenerator);
         this.mainContainer.add(this.lineSymbols);
+
+        // Create animation once during creation
+        this.createMonkeyAnimation();
+
+        // Add and play animation on the sprite
+        const man = this.add.sprite(gameConfig.scale.width / 2 + 800, gameConfig.scale.height / 1.60, 'man0')
+            .setScale(0.85)
+            .play('monkeySwing');
+    }
+
+    // Separate function for animation creation
+    private createMonkeyAnimation() {
         const frames = [];
         for (let i = 0; i <= 33; i++) {
-            frames.push({ key: `man${i}` }); // Use the same key names as loaded in preload
-          }
-          // Create an animation using frame objects
-          this.anims.create({
-            key: 'monkeySwing',   // Key for the animation
-            frames: frames,       // Frames array
-            frameRate: 25,        // Animation speed
-            repeat: -1            // Repeat indefinitely
-          });
-          // Add a sprite to play the animation
-          const man = this.add.sprite(gameConfig.scale.width/2 + 800, gameConfig.scale.height/ 1.60, 'man0').setScale(0.85);
-          // Play the animation on the sprite
-          man.play('monkeySwing');
+            frames.push({ key: `man${i}` }); 
+        }
+
+        this.anims.create({
+            key: 'monkeySwing',
+            frames: frames,
+            frameRate: 25,
+            repeat: -1 
+        });
     }
 
     update(time: number, delta: number) {
-        // this.slot.update(time, delta);
-        this.uiContainer.update()
-        // this.uiContainer.doubleBtnInit()
+        this.uiContainer.update();
     }
 
-    /**
-     * @method onResultCallBack Change Sprite and Lines
-     * @description update the spirte of Spin Button after reel spin and emit Lines number to show the line after wiining
-     */
-    onResultCallBack() {
-        const onSpinMusic = "onSpin"
+    private onResultCallBack() {
         this.uiContainer.onSpin(false);
-        this.soundManager.stopSound(onSpinMusic)
+        this.soundManager.stopSound("onSpin"); 
         this.lineGenerator.showLines(ResultData.gameData.linesToEmit);
     }
-    /**
-     * @method onSpinCallBack Move reel
-     * @description on spin button click moves the reel on Seen and hide the lines if there are any
-     */
-    onSpinCallBack() {
-        const onSpinMusic = "onSpin"
-        this.soundManager.playSound(onSpinMusic)
+
+    private onSpinCallBack() {
+        this.soundManager.playSound("onSpin");
         this.slot.moveReel();
         this.lineGenerator.hideLines();
     }
 
-    /**
-     * @method recievedMessage called from MyEmitter
-     * @param msgType ResultData
-     * @param msgParams any
-     * @description this method is used to update the value of textlabels like Balance, winAmount which we are reciving after every spin
-     */
     recievedMessage(msgType: string, msgParams: any) {
         if (msgType === 'ResultData') {
-            this.time.delayedCall(3000, () => {    
-                if (ResultData.gameData.isBonus) {
-                    if(this.uiContainer.isAutoSpinning){
-                        this.uiContainer.autoBetBtn.emit('pointerdown'); 
-                        this.uiContainer.autoBetBtn.emit('pointerup');
-                    }
-                    Globals.SceneHandler?.addScene('BonusScene', BonusScene, true)
-                }        
-                this.uiContainer.currentWiningText.updateLabelText(ResultData.playerData.currentWining.toString());
-                currentGameData.currentBalance = ResultData.playerData.Balance;
-                let betValue = (initData.gameData.Bets[currentGameData.currentBetIndex]) * 20
-                let jackpot = ResultData.gameData.jackpot
-                let winAmount = ResultData.gameData.WinAmout;   
-                this.uiContainer.currentBalanceText.updateLabelText(currentGameData.currentBalance.toFixed(2));
-                if (winAmount >= 15 * betValue && winAmount < 20 * betValue) {
-                    // HugeWinPopup
-                    this.showWinPopup(winAmount, 'hugeWinPopup')
-                } else if (winAmount >= 20 * betValue && winAmount < 25 * betValue) {
-                    //MegawinPopup
-                    this.showWinPopup(winAmount, 'megaWinPopup')
-                }
-            });
+            // Use setTimeout for better performance in this case
+            setTimeout(() => {
+                this.handleResultData();
+            }, 3000); 
+
+            // Stop tween after a delay for visual effect
             setTimeout(() => {
                 this.slot.stopTween();
             }, 1000);
-        }
-        if(msgType === 'GambleResult'){
+        } else if (msgType === 'GambleResult') {
             this.uiContainer.currentWiningText.updateLabelText(gambleResult.gamleResultData.currentWining.toString());
         }
     }
 
-    /**
-     * @method showWinPopup
-     * @description Displays a popup showing the win amount with an increment animation and different sprites
-     * @param winAmount The amount won to display in the popup
-     * @param spriteKey The key of the sprite to display in the popup
-     */
-    showWinPopup(winAmount: number, spriteKey: string) {
-        // Create the popup background
+    // Handle ResultData logic separately
+    private handleResultData() {
+        if (ResultData.gameData.isBonus) {
+            if (this.uiContainer.isAutoSpinning) {
+                // Emit events directly instead of simulating clicks
+                this.uiContainer.autoBetBtn.emit('pointerdown');
+                this.uiContainer.autoBetBtn.emit('pointerup'); 
+            }
+            Globals.SceneHandler?.addScene('BonusScene', BonusScene, true);
+        }
+
+        this.uiContainer.currentWiningText.updateLabelText(ResultData.playerData.currentWining.toString());
+        currentGameData.currentBalance = ResultData.playerData.Balance;
+        let betValue = (initData.gameData.Bets[currentGameData.currentBetIndex]) * 20;
+        let winAmount = ResultData.gameData.WinAmout;
+        this.uiContainer.currentBalanceText.updateLabelText(currentGameData.currentBalance.toFixed(2));
+
+        if (winAmount >= 15 * betValue && winAmount < 20 * betValue) {
+            this.showWinPopup(winAmount, 'hugeWinPopup');
+        } else if (winAmount >= 20 * betValue && winAmount < 25 * betValue) {
+            this.showWinPopup(winAmount, 'megaWinPopup');
+        }
+    }
+
+    // Function to show win popup
+    private showWinPopup(winAmount: number, spriteKey: string) {
         const inputOverlay = this.add.rectangle(0, 0, this.cameras.main.width, this.cameras.main.height, 0x000000, 0.7)
-        .setOrigin(0, 0)
-        .setDepth(9) // Set depth to be below the popup but above game elements
-        .setInteractive() // Make it interactive to block all input events
+            .setOrigin(0, 0)
+            .setDepth(9)
+            .setInteractive();
+
         inputOverlay.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
-            pointer.event.stopPropagation();
+            pointer.event.stopPropagation(); 
         });
 
         const megaWinBg = this.add.sprite(gameConfig.scale.width / 2, gameConfig.scale.height / 2, "megawinAnimBg")
-        .setDepth(10)
-        .setOrigin(0.5);
+            .setDepth(10)
+            .setOrigin(0.5);
 
-        // this.tweens.add({
-        //     targets: megaWinBg,
-        //     scale: 1.2, // Scale up a bit 
-        //     duration: 500, 
-        //     yoyo: true, 
-        //     repeat: -1, 
-        //     ease: 'Sine.easeInOut'
-        // });
         const megaWinStar = this.add.sprite(gameConfig.scale.width / 2, gameConfig.scale.height / 2, "megawinStar")
-            .setDepth(12) // Ensure it's above the rotating background
+            .setDepth(12)
             .setOrigin(0.5)
-            .setScale(0); // Start hidden (scaled down)
+            .setScale(0); 
 
         this.tweens.add({
             targets: megaWinStar,
-            scale: 1,  
+            scale: 1,
             duration: 500,
-            yoyo: true, 
+            yoyo: true,
             repeat: -1,
             ease: 'Sine.easeInOut',
-            delay: 250 // Start after half of megaWinBg's animation 
+            delay: 250 
         });
 
-        const coinFrames = [];
-        for (let i = 0; i < 19; i++) { // Assuming you have 50 frames (winning0 to winning49)
-            coinFrames.push({ key: `coin${i}` });
-        }
-        this.anims.create({
-            key: `coinFlip`,
-            frames: coinFrames,
-            frameRate: 10,
-            repeat: -1 
-        });
-        const winningSprite = this.add.sprite(gameConfig.scale.width / 4, gameConfig.scale.height * 0.8, `coin0`).setDepth(13).setScale(0.7)
-        winningSprite.play('coinFlip')
-        
-        const winSprite = this.add.sprite(this.cameras.main.centerX, this.cameras.main.centerY - 50, spriteKey).setScale(0.8);
-        winSprite.setDepth(13)
+        // Create coin flip animation once
+        this.createCoinFlipAnimation();
 
-        // Tween to animate the text increment from 0 to winAmount
+        const winningSprite = this.add.sprite(gameConfig.scale.width / 4, gameConfig.scale.height * 0.8, `coin0`)
+            .setDepth(13)
+            .setScale(0.7)
+            .play('coinFlip');
+
+        const winSprite = this.add.sprite(this.cameras.main.centerX, this.cameras.main.centerY - 50, spriteKey)
+            .setScale(0.8)
+            .setDepth(13);
+
         this.tweens.addCounter({
             from: 0,
             to: winAmount,
-            duration: 1000, // Duration of the animation in milliseconds
+            duration: 1000,
             onUpdate: (tween) => {
-                const value = Math.floor(tween.getValue());
-               
+                // You might want to do something with the incrementing value here
+                // For example, update a text object
             },
             onComplete: () => {
-                // Automatically close the popup after a few seconds
                 this.time.delayedCall(4000, () => {
                     inputOverlay.destroy();
-                    // winBg.destroy();
                     megaWinBg.destroy();
                     megaWinStar.destroy();
                     winSprite.destroy();
-                    winningSprite.stop()
+                    winningSprite.stop();
                     winningSprite.destroy();
                 });
             }
         });
     }
 
+    // Separate function for coin flip animation
+    private createCoinFlipAnimation() {
+        const coinFrames = [];
+        for (let i = 0; i < 19; i++) {
+            coinFrames.push({ key: `coin${i}` });
+        }
 
-   
+        this.anims.create({
+            key: `coinFlip`,
+            frames: coinFrames,
+            frameRate: 10,
+            repeat: -1
+        });
+    }
 }

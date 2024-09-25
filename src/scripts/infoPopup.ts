@@ -57,7 +57,6 @@ export default class InfoScene extends Scene{
         const symbol6 = this.add.sprite(750, 600, "inofIcon6").setScale(0.85)
         const symbol7 = this.add.sprite(1050, 600, "inofIcon7").setScale(0.85)
         const symbol8 = this.add.sprite(1350, 600, "inofIcon8").setScale(0.85)
-        console.log(initData.UIData.symbols[0], "initData.UIData.symbols[0]");
         const infoIcons = [
             { x: 540, y: 400 }, // Position for infoIcon2
             { x: 840, y: 400 }, // Position for infoIcon3

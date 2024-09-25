@@ -144,7 +144,6 @@ export default class GambleScene extends Scene {
             onComplete: () => {
                 // Change texture when at the halfway point
                 card.setTexture(this.getCardTexture(newCardData));
-                
                 // Continue the flip
                 this.tweens.add({
                     targets: card,
@@ -156,9 +155,6 @@ export default class GambleScene extends Scene {
     }
 
     getCardTexture(cardData: any) {
-        // You should map the card data to the correct texture here
-        console.log(`${cardData.suit}${cardData.value}`);
-        
         return `${cardData.suit}${cardData.value}`; // Example texture naming
     }
 
@@ -170,5 +166,15 @@ export default class GambleScene extends Scene {
         });
         this.DealerCard.setTexture("BackCard1");
         this.isGambleResultRequested = false; // Reset the flag to allow new results
+        const elements = [
+            this.doubleButton,
+            this.collecButton,
+            this.doubleButtonText,
+            this.collectButtonText
+        ];
+        elements.forEach(element => {
+            element.destroy();
+        });
+        
     }
 }

@@ -21,10 +21,8 @@ export class UiContainer extends Phaser.GameObjects.Container {
     linesNumber!: Phaser.GameObjects.Sprite;
     fadeDoubbleButton!: Phaser.GameObjects.Sprite;
     public isAutoSpinning: boolean = false; // Flag to track if auto-spin is active
-    mainScene!: Phaser.Scene
-    fireSprite1!: Phaser.GameObjects.Sprite
-    fireSprite2!: Phaser.GameObjects.Sprite
     betButtonDisable!: Phaser.GameObjects.Container
+    private winTween: Phaser.Tweens.Tween | null = null; // Store the win tween
 
     constructor(scene: Scene, spinCallBack: () => void, soundManager: SoundManager) {
         super(scene);
@@ -69,7 +67,7 @@ export class UiContainer extends Phaser.GameObjects.Container {
                 this.pBtn.setTexture('pBtn');
                 this.pBtn.setInteractive({ useHandCursor: true, pixelPerfect: true });
             });
-        }).setDepth(0).setScale(0.8);
+        }).setDepth(8).setScale(0.8);
         container.add(this.pBtn);
         this.CurrentLineText = new TextLabel(this.scene, linePanel.x, linePanel.y, initData.gameData.Bets[currentGameData.currentBetIndex], 27, "#ffffff");
         //Line Count
@@ -91,19 +89,9 @@ export class UiContainer extends Phaser.GameObjects.Container {
         this.WiningText = this.scene.add.text(-70, 15, "Winnings", {color:"#0ac9ff", fontSize: "30px", align:"center"})
         const winPanelChild = this.scene.add.container(winPanel.x, winPanel.y)
         winPanelChild.add([this.currentWiningText, this.WiningText]);
-        if(currentWining > 0){
-            // console.log(currentWining, "currentWining");
-            this.scene.tweens.add({
-                targets:  this.currentWiningText,
-                scaleX: 1.3, 
-                scaleY: 1.3, 
-                duration: 500, // Duration of the scale effect
-                yoyo: true, 
-                repeat: -1, 
-                ease: 'Sine.easeInOut' // Easing function
-            });
-        }
     }
+
+
     /**
      * @method balanceBtnInit Remaning balance after bet (total)
      * @description added the sprite/placeholder and Text for Total Balance 
@@ -390,7 +378,7 @@ export class UiContainer extends Phaser.GameObjects.Container {
                     ease: 'Sine.easeInOut'
                 });
 
-                this.scene.tweens.add({
+                this.winTween = this.scene.tweens.add({
                     targets:  this.currentWiningText,
                     scaleX: 1.3, 
                     scaleY: 1.3, 
@@ -407,8 +395,12 @@ export class UiContainer extends Phaser.GameObjects.Container {
             if (this.doubleButton) {
                 this.scene.tweens.killTweensOf(this.doubleButton);
                 this.doubleButton.destroy(); 
-            }
-           
+            }  
+            if(parseFloat(this.currentWiningText.text) === 0){
+                if(this.winTween){
+                    this.winTween.stop();
+                }
+            }                    
         }
     }
     

@@ -278,7 +278,6 @@ export class Slots extends Phaser.GameObjects.Container {
             for (let j = 0; j < this.slotSymbols[i].length; j++) {
                 const symbol = this.slotSymbols[i][j];
                 const winningSprite = symbol.symbol.parentContainer.getByName(`winningSprite_${i}_${j}`) as Phaser.GameObjects.Sprite;
-                console.log(winningSprite, "winningSprite");
                 if (winningSprite) {
                     winningSprite.anims.stop();
                     winningSprite.destroy();
@@ -343,18 +342,13 @@ class Symbols {
         }
     }
     playAnimation(animationId: any) {
-        console.log(animationId, "playanimation", this.symbol);
-        
-        this.symbol.play(animationId)
+       this.symbol.play(animationId)
     }
     stopAnimation() {
         // console.log(this.symbol.anims.isPlaying);
         if (this.symbol.anims.isPlaying) {
             this.symbol.anims.stop();
-            // this.symbol.setFrame(0);
-        } else {
-            // console.log("Animation is not playing on this symbol.");
-        }
+        } 
     }
     endTween() {
         if (this.index.y < 3) {
