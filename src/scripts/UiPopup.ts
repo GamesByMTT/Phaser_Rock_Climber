@@ -26,7 +26,6 @@ export class UiPopups extends Phaser.GameObjects.Container {
     toggleBar!: InteractiveBtn;
     soundEnabled: boolean = true; // Track sound state
     musicEnabled: boolean = true; // Track sound state
-    normalButtonSound!: Phaser.Sound.BaseSound
     popupBackground!: Phaser.GameObjects.Sprite;  // Background sprite for popup
     pageViewContainer!: Phaser.GameObjects.Container;
     currentPageIndex: number = 0;
@@ -415,10 +414,8 @@ export class UiPopups extends Phaser.GameObjects.Container {
             this.scene.textures.get("yesButtonHover")
         ];
         this.noBtn = new InteractiveBtn(this.scene, logoutNoButtonSprite, () => {
-            
             this.UiContainer.onSpin(false);
             this.exitBtn.setInteractive()
-            // this.exitBtn.setTexture("normalButton");
             popupContainer.destroy();
             blurGraphic.destroy(); // Destroy blurGraphic when popup is closed
         }, 0, true);

@@ -3,7 +3,6 @@ import { Scene, GameObjects, Types } from 'phaser';
 import { Globals, ResultData, currentGameData, initData } from './Globals';
 import { TextLabel } from './TextLabel';
 import { gameConfig } from './appconfig';
-import MainScene from '../view/MainScene';
 import SoundManager from './SoundManager';
 import GambleScene from '../view/GambleScene';
 // Define UiContainer as a Phaser Scene class
@@ -13,16 +12,12 @@ export class UiContainer extends Phaser.GameObjects.Container {
     maxbetBtn!: Phaser.GameObjects.Sprite;
     autoBetBtn!: Phaser.GameObjects.Sprite;
     doubleButton!: Phaser.GameObjects.Sprite;
-    freeSpinBgImg!: Phaser.GameObjects.Sprite
-    fireAnimation: Phaser.GameObjects.Sprite[] = [];
     CurrentBetText!: TextLabel;
     currentWiningText!: TextLabel;
     WiningText!: Phaser.GameObjects.Text;
     currentBalanceText!: TextLabel;
     CurrentLineText!: TextLabel;
-    freeSpinText!: TextLabel;
     pBtn!: Phaser.GameObjects.Sprite;
-    mBtn!: Phaser.GameObjects.Sprite;
     linesNumber!: Phaser.GameObjects.Sprite;
     fadeDoubbleButton!: Phaser.GameObjects.Sprite;
     public isAutoSpinning: boolean = false; // Flag to track if auto-spin is active
@@ -30,9 +25,6 @@ export class UiContainer extends Phaser.GameObjects.Container {
     fireSprite1!: Phaser.GameObjects.Sprite
     fireSprite2!: Phaser.GameObjects.Sprite
     betButtonDisable!: Phaser.GameObjects.Container
-    freeSpinContainer!: Phaser.GameObjects.Container
-    spinButtonSound!: Phaser.Sound.BaseSound
-    normalButtonSound!: Phaser.Sound.BaseSound
 
     constructor(scene: Scene, spinCallBack: () => void, soundManager: SoundManager) {
         super(scene);
@@ -266,28 +258,7 @@ export class UiContainer extends Phaser.GameObjects.Container {
     linesNumberInit(){
         this.linesNumber = this.scene.add.sprite(gameConfig.scale.width / 3.35, gameConfig.scale.height - this.maxbetBtn.height , "linesNumber").setScale(0.8)
     }
-    /**
-     * @method freeSpininit 
-     * @description this method is used for showing the number of freeSpin value at the top of reels
-     */
-    freeSpininit(freeSpinNumber: number){
-        if(freeSpinNumber == 0){
-            if(this.freeSpinBgImg){
-                this.freeSpinBgImg.destroy();
-                this.freeSpinText.destroy()
-                this.freeSpinContainer.destroy();
-            }   
-        }
-        if(freeSpinNumber >= 1){
-            // this.freeSpinContainer = this.scene.add.container(gameConfig.scale.width/2, gameConfig.scale.height*0.15);
-            // const freeSpinBg = this.scene.add.sprite(this.freeSpinContainer.x, this.freeSpinContainer.y, "").setScale(0.8, 0.5);
-            // const freeSpinCount = new TextLabel(this.scene, freeSpinBg.x - 20, freeSpinBg.y - 5, "Free Spin : ", 27, "#ffffff");
-            // this.freeSpinText = new TextLabel(this.scene, freeSpinBg.x + 55, freeSpinBg.y - 5, freeSpinNumber.toString(), 27, "#ffffff")
-            // this.freeSpinBgImg = freeSpinBg
-        }else{
-           
-        }
-    }
+   
     /**
      * @method startSpinRecursion
      * @param spinCallBack 
