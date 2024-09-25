@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import { Globals, initData, TextStyle } from "./Globals";
+import { Globals } from "./Globals";
 import { gameConfig } from "./appconfig";
 import { UiContainer } from "./UiContainer";
 import SoundManager from "./SoundManager";
@@ -148,10 +148,6 @@ export class UiPopups extends Phaser.GameObjects.Container {
         inputOverlay.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
             pointer.event.stopPropagation();
         });
-    
-        // const settingblurGraphic = this.scene.add.graphics();
-        // settingblurGraphic.fillStyle(0x000000, 0.5);
-        // settingblurGraphic.fillRect(0, 0, this.scene.scale.width, this.scene.scale.height);
     
         const numSteps = 10; // 10 steps for 0.0 to 1.0
         let soundLevel = Math.round(this.SoundManager.getMasterVolume() * (numSteps - 1));
